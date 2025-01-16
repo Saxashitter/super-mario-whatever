@@ -7,7 +7,7 @@ RELEASE = false
 GAME_WIDTH = 256
 GAME_HEIGHT = 224
 
-GRAVITY = 0.25
+GRAVITY = 0.280
 PHYSICS_RATE = 1/60
 
 -- Enables the debug stats
