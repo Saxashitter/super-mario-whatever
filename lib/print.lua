@@ -8,8 +8,9 @@ function print(...)
 	local args = {...}
 
 	for i = 1,#args do
+		_print(tostring(args[i]))
 		table.insert(print_objects, {
-			text = args[i],
+			text = tostring(args[i]),
 			time = VISIBLE_TIME
 		})
 
@@ -23,7 +24,7 @@ function printLib.update(dt)
 	local rmvList = {}
 
 	for i,obj in pairs(print_objects) do
-		obj.time = math.max(0, obj.time - dt)
+		obj.time = math.max(0, obj.time - (1/60))
 
 		if obj.time == 0 then
 			table.insert(rmvList, obj)
@@ -40,11 +41,23 @@ function printLib.update(dt)
 	end
 end
 
-function printLib.draw()
-	local y = love.graphics.getHeight() - (18 * #print_objects)
+local function get_height(str, font)
+	local _, count = str:gsub("\n", "\n")
 
-	for k,v in pairs(print_objects) do
-		love.graphics.print(v.text, 4, y + (18 * (k - 1)))
+	return font:getHeight() * (count+1)
+end
+
+function printLib.draw()
+	local font = love.graphics.getFont()
+	local y = love.graphics.getHeight()
+
+	for k,v in ipairs(print_objects) do
+		y = y - get_height(v.text, font)
+	end
+
+	for k,v in ipairs(print_objects) do
+		love.graphics.print(v.text, 4, y)
+		y = y + get_height(v.text, font)
 	end
 end
 

@@ -2,66 +2,14 @@
 -- !! This flag controls the ability to toggle the debug view.         !!
 -- !! You will want to turn this to 'true' when you publish your game. !!
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-RELEASE = false
-
-GAME_WIDTH = 256
-GAME_HEIGHT = 224
+GAME_SCALE = 2
+GAME_WIDTH = 256*GAME_SCALE
+GAME_HEIGHT = 224*GAME_SCALE
 
 GRAVITY = 0.280
 PHYSICS_RATE = 1/60
 
--- Enables the debug stats
-DEBUG = not RELEASE
-
-CONFIG = {
-    graphics = {
-        filter = {
-            -- FilterModes: linear (blurry) / nearest (blocky)
-            -- Default filter used when scaling down
-            down = "nearest",
-
-            -- Default filter used when scaling up
-            up = "nearest",
-
-            -- Amount of anisotropic filter performed
-            anisotropy = 1,
-        }
-    },
-
-    window = {
-        icon = 'assets/images/icon.png'
-    },
-
-    debug = {
-        -- The key (scancode) that will toggle the debug state.
-        -- Scancodes are independent of keyboard layout so it will always be in the same
-        -- position on the keyboard. The positions are based on an American layout.
-        key = '`',
-
-        stats = {
-            font            = nil, -- set after fonts are created
-            fontSize        = 16,
-            lineHeight      = 18,
-            foreground      = {1, 1, 1, 1},
-            shadow          = {0, 0, 0, 1},
-            shadowOffset    = {x = 1, y = 1},
-            position        = {x = 8, y = 6},
-
-            kilobytes = false,
-        },
-
-        -- Error screen config
-        error = {
-            font            = nil, -- set after fonts are created
-            fontSize        = 16,
-            background      = {.1, .31, .5},
-            foreground      = {1, 1, 1},
-            shadow          = {0, 0, 0, .88},
-            shadowOffset    = {x = 1, y = 1},
-            position        = {x = 70, y = 70},
-        },
-    }
-}
+DEBUG = true
 
 local function makeFont(path)
     return setmetatable({}, {
@@ -89,9 +37,6 @@ Fonts = {
 }
 Fonts.default = Fonts.regular
 
-CONFIG.debug.stats.font = Fonts.monospace
-CONFIG.debug.error.font = Fonts.monospace
-
 -- LIBRARIES
 require("lib.batteries"):export()
 
@@ -100,23 +45,30 @@ Camera = require "lib.camera"
 Baton = require "lib.baton"
 Lovepad = require "lib.lovepad"
 PrintLib = require "lib.print"
-
-Gamestate = state_machine({
-	game = require "src.states.game"
-})
+Ease = require "lib.easing"
 
 Maid64 = require "lib.maid64"
 Maid64.setup(GAME_WIDTH, GAME_HEIGHT)
 
 -- OBJECTS
-local OBJECTS_PATH = "src.objects."
+local OBJECTS_PATH = "src.objects"
 
+require(OBJECTS_PATH..".backend.gameobject")
+require(OBJECTS_PATH..".backend.animation")
+require(OBJECTS_PATH..".backend.state")
 require(OBJECTS_PATH..".player")
 require(OBJECTS_PATH..".level")
-require(OBJECTS_PATH..".backend.animation")
+
+-- STATES
+local STATE_PATH = "src.states"
+require(STATE_PATH..".game")
+require(STATE_PATH..".title")
 
 -- SLICK WORLD
 World = Slick.newWorld(GAME_WIDTH, GAME_HEIGHT)
+
+-- GAMESTATE
+CurrentState = StateMachine(GameState)
 
 -- REDEFINE FOR BIGGER STAGES!
 -- CONTROLS
@@ -182,5 +134,18 @@ Controls = {
 		return down
 	end
 }
+
+function dump(o)
+   if type(o) == 'table' then
+      local s = '{ '
+      for k,v in pairs(o) do
+         if type(k) ~= 'number' then k = '"'..k..'"' end
+         s = s .. '['..k..'] = ' .. dump(v) .. ','
+      end
+      return s .. '} '
+   else
+      return tostring(o)
+   end
+end
 
 Controls:init()

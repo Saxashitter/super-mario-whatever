@@ -24,6 +24,9 @@ local responses
 --- @module "slick.shape"
 local shape
 
+--- @module "slick.tag"
+local tag
+
 --- @module "slick.util"
 local util
 
@@ -48,6 +51,7 @@ local function load()
     defaultOptions = require("slick.options")
     responses = require("slick.responses")
     shape = require("slick.shape")
+    tag = require("slick.tag")
     util = require("slick.util")
     world = require("slick.world")
     worldQuery = require("slick.worldQuery")
@@ -59,10 +63,10 @@ end
 do
     local basePath = PATH:gsub("%.", "/")
     if basePath == "" then
-        basePath = "."
+        basePath = "./"
     end
 
-    local pathPrefix = string.format("%s/?.lua;%s/?/init.lua", basePath, basePath)
+    local pathPrefix = string.format("%s?.lua;%s?/init.lua", basePath, basePath)
 
     local oldLuaPath = package.path
     local oldLovePath = love and love.filesystem and love.filesystem.getRequirePath()
@@ -99,6 +103,7 @@ return {
     entity = entity,
     geometry = geometry,
     shape = shape,
+    tag = tag,
     util = util,
     world = world,
     worldQuery = worldQuery,
@@ -110,13 +115,22 @@ return {
     newWorldQuery = worldQuery.new,
     newTransform = geometry.transform.new,
 
-    newBoxShape = shape.newBox,
+    newRectangleShape = shape.newRectangle,
     newCircleShape = shape.newCircle,
     newLineSegmentShape = shape.newLineSegment,
     newPolygonShape = shape.newPolygon,
     newPolylineShape = shape.newPolyline,
     newPolygonMeshShape = shape.newPolygonMesh,
     newShapeGroup = shape.newShapeGroup,
+    newTag = tag.new,
+
+    triangulate = geometry.simple.triangulate,
+    polygonize = geometry.simple.polygonize,
+    clip = geometry.simple.clip,
+
+    newUnionClipOperation = geometry.simple.newUnionClipOperation,
+    newIntersectionClipOperation = geometry.simple.newIntersectionClipOperation,
+    newDifferenceClipOperation = geometry.simple.newDifferenceClipOperation,
 
     drawWorld = draw
 }
