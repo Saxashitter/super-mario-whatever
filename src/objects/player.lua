@@ -8,7 +8,7 @@ Player.states = {
 Player.state = Player.states.normal
 Player.width = 10
 Player.height = 24
-Player.runTime = 2
+Player.runTime = 1.5
 
 local GRID_SIZE = 48
 

@@ -2,7 +2,7 @@
 -- !! This flag controls the ability to toggle the debug view.         !!
 -- !! You will want to turn this to 'true' when you publish your game. !!
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-GAME_SCALE = 2
+GAME_SCALE = 4
 GAME_WIDTH = 256*GAME_SCALE
 GAME_HEIGHT = 224*GAME_SCALE
 

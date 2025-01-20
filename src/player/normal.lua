@@ -1,14 +1,14 @@
 local state = {}
 
-local WALKSPEED = 1.6
-local MINWALKSPEED = .5
-local RUNSPEED = 2.7
-local MAXRUNSPEED = 4.2
-local WALKACCEL = .17
-local RUNACCEL = .23
-local SKIDDECEL = .32
-local DECEL = .14
-local JUMPHEIGHT = 4
+local WALK_SPEED = 1.6
+local MIN_WALK_SPEED = .5
+local RUN_SPEED = 3.4
+local MAX_RUN_SPEED = 4.2
+local WALK_ACCEL = .17
+local RUN_ACCEL = .23
+local SKID_DECEL = .32
+local DECEL = .09
+local JUMP_HEIGHT = 4
 
 local WALL_WIDTH = 4
 local WALL_HEIGHT = 5
@@ -32,13 +32,13 @@ local function handle_animation(self)
 
 	if math.abs(self.momx) > 0 then
 		animName = "walk"
-		self.animation.speed = math.abs(self.momx) / WALKSPEED
+		self.animation.speed = math.abs(self.momx) / WALK_SPEED
 		self.dir = mathx.sign(self.momx)
 	else
 		self.animation.speed = 1
 	end
 
-	if math.abs(self.momx) > RUNSPEED then
+	if math.abs(self.momx) > RUN_SPEED then
 		animName = "run"
 	end
 
@@ -82,13 +82,13 @@ function state:physics()
 
 		if self:isOnGround() then
 			self.jumped = true
-			self.momy = -JUMPHEIGHT
+			self.momy = -JUMP_HEIGHT
 		elseif wall then
-			local speed = math.max(WALKSPEED*2.25, math.abs(self.momx))
+			local speed = math.max(WALK_SPEED*2.25, math.abs(self.momx))
 
 			self.dir = dir*-1
 			self.momx = speed*self.dir
-			self.momy = -JUMPHEIGHT
+			self.momy = -JUMP_HEIGHT
 			self.jumped = true
 		end
 	end
@@ -115,35 +115,35 @@ function state:physics()
 
 	if movedir == 0 then
 		if dir ~= 0
-		and self.momx*movedir < MINWALKSPEED then
-			self.momx = MINWALKSPEED*dir
+		and self.momx*movedir < MIN_WALK_SPEED then
+			self.momx = MIN_WALK_SPEED*dir
 		end
 	else
-		local accel = WALKACCEL
-		local speed = WALKSPEED
+		local accel = WALK_ACCEL
+		local speed = WALK_SPEED
 
 		if dir == 0 then
 			accel = DECEL
 		elseif dir == -movedir
 		and self:isOnGround() then
-			accel = SKIDDECEL
+			accel = SKID_DECEL
 		end
 
 		if Controls:down("run") then
-			speed = RUNSPEED
+			speed = RUN_SPEED
 			if dir == movedir then
-				accel = RUNACCEL
+				accel = RUN_ACCEL
 			end
 
 			if self.runTime == Player.runTime then
-				speed = MAXRUNSPEED
+				speed = MAX_RUN_SPEED
 			end
 		end
 		
 		self.momx = mathx.approach(self.momx, speed*dir, accel)
 	end
 
-	if math.abs(self.momx) > WALKSPEED
+	if math.abs(self.momx) > WALK_SPEED
 	and Controls:down("run") then
 		self.runTime = math.min(self.runTime + (1/60), Player.runTime)
 	elseif self:isOnGround()

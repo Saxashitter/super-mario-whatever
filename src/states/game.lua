@@ -3,7 +3,12 @@ GameState = class{name = "GameState", extends = State}
 local map = require "assets.data.maps.test"
 
 local function CAMERA_POS(self)
-	local x, y = self.player.x+self.player.width/2, self.player.y+self.player.height/2
+	local width, height = self.player.width/2, self.player.height/2
+	local x, y = self.player.x, self.player.y
+
+	x = x + width
+	y = y + height
+
 	local scale = GAME_SCALE
 
 	local cam = self.level:isInCamera(self.player)
@@ -69,4 +74,5 @@ function GameState:update(dt)
 	State.update(self, dt)
 
 	self.gameCamera.x, self.gameCamera.y, self.gameCamera.scale = CAMERA_POS(self)
+	print(dt)
 end

@@ -4,6 +4,9 @@ StateMachine = class{name = "StateMachine"}
 State = class{name = "State"}
 
 -- first we define State
+local PHYSICS_RATE = 1/60
+
+State.interpolation = true
 
 function State:new()
 	self._objects = {}
@@ -36,12 +39,25 @@ function State:update(dt)
 	for i,object in pairs(self._objects) do
 		object:update(dt)
 	end
-	while self._physics_time >= 1/60 do
+	while self._physics_time >= PHYSICS_RATE do
 		for i,object in pairs(self._objects) do
 			object:physics(dt)
 		end
-		self._physics_time = self._physics_time - (1/60)
+		self._physics_time = self._physics_time - PHYSICS_RATE
 	end
+end
+
+function State:getInterpolationPosition(object)
+	if not self.interpolation then
+		return object.x, object.y
+	end
+
+	local lerp = math.min(self._physics_time / PHYSICS_RATE, 1)
+
+	local x, y = object.x, object.y
+	local tx, ty = object.x+object.momx, object.y+object.momy
+
+	return mathx.lerp(x, tx, lerp), mathx.lerp(y, ty, lerp)
 end
 
 function State:exit()
@@ -98,4 +114,11 @@ function StateMachine:draw()
 	if not self.current then return end
 
 	self.current:draw()
+end
+
+function StateMachine:call(value, ...)
+	if not self.current then return end
+	if not self.current[value] then return end
+
+	return self.current[value](self, ...)
 end
