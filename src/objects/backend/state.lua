@@ -66,16 +66,30 @@ function State:exit()
 	end
 end
 
+local function is_in_bounds(object, x,y,w,h)
+	return object.x+object.width >= x
+	and object.x <= x+w
+	and object.y+object.height >= y
+	and object.y <= y+h
+end
+
 function State:draw()
+	local x, y, w, h = 0,0,GAME_WIDTH,GAME_HEIGHT
 	for i, object in pairs(self._objects) do
 		if object.camera then
-			object.camera:attach(0,0, GAME_WIDTH, GAME_HEIGHT)
-		end
+			local w, h = GAME_WIDTH/object.camera.scale, GAME_HEIGHT/object.camera.scale
+			local x = object.camera.x - w/2
+			local y = object.camera.y - h/2
 
-		object:draw()
-
-		if object.camera then
-			object.camera:detach()
+			if object.alwaysDraw or is_in_bounds(object, x,y,w,h) then
+				object.camera:attach(0,0, GAME_WIDTH, GAME_HEIGHT)
+				object:draw()
+				object.camera:detach()
+			end
+		else
+			if object.alwaysDraw or is_in_bounds(obj, x,y,w,h) then
+				object:draw()
+			end
 		end
 	end
 end

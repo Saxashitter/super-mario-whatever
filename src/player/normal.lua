@@ -23,7 +23,8 @@ local function handle_animation(self)
 
 	if not self:isOnGround() then
 		self.animation.speed = 1
-		if self.animation.name ~= "jump" then
+		if self.animation.name ~= "jump"
+		and self.animation.name ~= "walljump" then
 			self.animation:switch"jump"
 		end
 
@@ -101,6 +102,11 @@ function state:physics()
 		and not self:isOnGround() then
 			self.jumped = false
 		end
+	end
+
+	if Controls:down("down")
+	and self.momx > WALK_SPEED then
+		self:changeState("slide")
 	end
 
 	local dir = 0

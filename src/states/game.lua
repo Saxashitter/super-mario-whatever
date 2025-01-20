@@ -74,5 +74,4 @@ function GameState:update(dt)
 	State.update(self, dt)
 
 	self.gameCamera.x, self.gameCamera.y, self.gameCamera.scale = CAMERA_POS(self)
-	print(dt)
 end

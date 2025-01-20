@@ -14,7 +14,7 @@ function print(...)
 			time = VISIBLE_TIME
 		})
 
-		if #print_objects > 5 then
+		if #print_objects > 10 then
 			table.remove(print_objects, 1)
 		end
 	end

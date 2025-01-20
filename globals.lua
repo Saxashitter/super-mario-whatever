@@ -56,8 +56,10 @@ local OBJECTS_PATH = "src.objects"
 require(OBJECTS_PATH..".backend.gameobject")
 require(OBJECTS_PATH..".backend.animation")
 require(OBJECTS_PATH..".backend.state")
-require(OBJECTS_PATH..".player")
-require(OBJECTS_PATH..".level")
+require(OBJECTS_PATH..".tilemap.tileset")
+require(OBJECTS_PATH..".tilemap.tile")
+require(OBJECTS_PATH..".tilemap.level")
+require(OBJECTS_PATH..".entities.player")
 
 -- STATES
 local STATE_PATH = "src.states"

@@ -4,6 +4,7 @@ GameObject = class({
 
 GameObject.width = 8
 GameObject.height = 8
+GameObject.alwaysDraw = false
 
 function GameObject:defineShape()
 	return Slick.newShapeGroup(
@@ -12,13 +13,15 @@ function GameObject:defineShape()
 	)
 end
 
-function GameObject:new(x, y, addToWorld)
+function GameObject:new(x, y, dontAdd)
 	self.x = x or 0
 	self.y = y or 0
 	self.momx = 0
 	self.momy = 0
 
-	World:add(self, self.x, self.y, self:defineShape())
+	if not dontAdd then
+		World:add(self, self.x, self.y, self:defineShape())
+	end
 end
 
 function GameObject:update(dt)
