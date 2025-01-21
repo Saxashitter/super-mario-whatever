@@ -54,11 +54,14 @@ function GameState:new()
 	self.gameCamera = Camera()
 	self.gameCamera.scale = GAME_SCALE
 
-	self.hudCamera = Camera()
-	self.hudCamera.scale = GAME_SCALE
+	self.hudCamera = Camera(GAME_WIDTH/2, GAME_HEIGHT/2)
 
 	self.level = Level(0, 0, map)
 	self.level.camera = self.gameCamera
+	for k,v in pairs(self.level.objects) do
+		v.camera = self.gameCamera
+		self:add(v)
+	end
 	self:add(self.level)
 
 	self.player = Player(0, 0)
@@ -66,6 +69,9 @@ function GameState:new()
 	self:add(self.player)
 
 	self.gameCamera.x, self.gameCamera.y, self.gameCamera.scale = CAMERA_POS(self)
+
+	self.timer = MamoruTimer(0, 128)
+	self:add(self.timer)
 
 	World:optimize()
 end

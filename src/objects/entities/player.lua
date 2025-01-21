@@ -10,7 +10,7 @@ Player.state = Player.states.normal
 Player.width = 10
 Player.height = 24
 Player.character = "mario"
-Player.runTime = 1.5
+Player.runTime = 1.9
 
 local GRID_SIZE = 48
 
@@ -19,7 +19,7 @@ function Player:new(x, y)
 	image:setFilter("nearest")
 
 	self.image = image
-	self.animation = Animation(image, GRID_SIZE, {
+	self.animation = Animation(image, GRID_SIZE, GRID_SIZE, {
 		default = "idle",
 		{name = "idle", frames = {{0,0}}, fps = 1},
 		{name = "walk", frames = {{1,1}, {1,2}, {1,3}, {1,4}}, fps = 8},

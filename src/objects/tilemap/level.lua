@@ -24,10 +24,10 @@ local parsers = {
 					error "No tileset!"
 				end
 
-				local x = math.floor((i % map_lua.width)-1) * map_lua.tilewidth
-				local y = math.floor((i / map_lua.width)-1) * map_lua.tileheight
-				local tile = tileset:createTile(tileid, x, y)
-				table.insert(self.tiles, tile)
+				local x = math.floor((i - 1) % map_lua.width) * map_lua.tilewidth
+				local y = math.floor((i - 1) / map_lua.width) * map_lua.tileheight
+
+				table.insert(self.objects, tileset:createTile(tileid, x, y))
 			end
 		end
 	end,
@@ -75,7 +75,7 @@ function Level:new(x, y, map_lua)
 	self.tilewidth = map_lua.tilewidth
 	self.tileheight = map_lua.tileheight
 	self.tilesets = {}
-	self.tiles = {}
+	self.objects = {}
 
 	self.cameras = {}
 	self.boxes = {}
@@ -94,21 +94,12 @@ function Level:new(x, y, map_lua)
 	if #self.world_group >= 1 then
 		World:add(self, self.x, self.y, Slick.newShapeGroup(unpack(self.world_group)))
 	end
-
-	self.canvas = love.graphics.newCanvas(map_lua.width*map_lua.tilewidth, map_lua.height*map_lua.tileheight)
-
-	love.graphics.setCanvas(self.canvas)
-	for k,v in pairs(self.tiles) do
-		v:draw()
-	end
-	love.graphics.setCanvas()
 end
 
 function Level:update(dt) end
 function Level:physics() end
 
 function Level:draw()
-	love.graphics.draw(self.canvas)
 	if not DEBUG then return end
 
 	for k,v in pairs(self.boxes) do

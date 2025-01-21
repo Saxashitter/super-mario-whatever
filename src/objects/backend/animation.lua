@@ -2,7 +2,7 @@ Animation = class({
 	name = "Animation"
 })
 
-function Animation:new(image, gridSize, anims)
+function Animation:new(image, gridX, gridY, anims)
 	self.image = image
 	self.animations = {}
 	self.current = {{0, 0}}
@@ -13,8 +13,8 @@ function Animation:new(image, gridSize, anims)
 	self.framerate = 1
 	self.speed = 1
 
-	self.columns = math.floor(image:getWidth()/gridSize)
-	self.rows = math.floor(image:getHeight()/gridSize)
+	self.columns = math.floor(image:getWidth()/gridX)
+	self.rows = math.floor(image:getHeight()/gridY)
 
 	self.frames = {}
 
@@ -22,10 +22,10 @@ function Animation:new(image, gridSize, anims)
 		self.frames[y] = {}
 		for x = 0, self.columns do
 			self.frames[y][x] = love.graphics.newQuad(
-				x*gridSize,
-				y*gridSize,
-				gridSize,
-				gridSize,
+				x*gridX,
+				y*gridY,
+				gridX,
+				gridY,
 				image:getDimensions()
 			)
 		end

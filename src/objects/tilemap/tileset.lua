@@ -16,7 +16,7 @@ function TileSet:new(properties)
 		while x < self.image:getWidth() do
 			table.insert(self.tiles, {
 				quad = love.graphics.newQuad(
-					x,
+					x-1,
 					y,
 					properties.grid.width,
 					properties.grid.height,
@@ -50,7 +50,6 @@ end
 
 function TileSet:createTile(id, x, y)
 	if not self.tiles[id] then return false end
-	print "make tile"
 
 	return Tile(x, y, self.tiles[id], self)
 end

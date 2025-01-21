@@ -24,6 +24,9 @@ function State:kill(object)
 end
 
 function State:add(object)
+	if object == nil then
+		error "bro..."
+	end
 	if self._object_indexes[object] then
 		return
 	end
@@ -37,11 +40,15 @@ function State:update(dt)
 	self._physics_time = self._physics_time + dt
 
 	for i,object in pairs(self._objects) do
-		object:update(dt)
+		if object.update then
+			object:update(dt)
+		end
 	end
 	while self._physics_time >= PHYSICS_RATE do
 		for i,object in pairs(self._objects) do
-			object:physics(dt)
+			if object.physics then
+				object:physics(dt)
+			end
 		end
 		self._physics_time = self._physics_time - PHYSICS_RATE
 	end
@@ -74,21 +81,23 @@ local function is_in_bounds(object, x,y,w,h)
 end
 
 function State:draw()
-	local x, y, w, h = 0,0,GAME_WIDTH,GAME_HEIGHT
 	for i, object in pairs(self._objects) do
-		if object.camera then
-			local w, h = GAME_WIDTH/object.camera.scale, GAME_HEIGHT/object.camera.scale
-			local x = object.camera.x - w/2
-			local y = object.camera.y - h/2
-
-			if object.alwaysDraw or is_in_bounds(object, x,y,w,h) then
-				object.camera:attach(0,0, GAME_WIDTH, GAME_HEIGHT)
-				object:draw()
-				object.camera:detach()
-			end
-		else
-			if object.alwaysDraw or is_in_bounds(obj, x,y,w,h) then
-				object:draw()
+		if object.draw then
+			if object.camera then
+				local w, h = GAME_WIDTH/object.camera.scale, GAME_HEIGHT/object.camera.scale
+				local x = object.camera.x - w/2
+				local y = object.camera.y - h/2
+	
+				if object.alwaysDraw or is_in_bounds(object, x,y,w,h) then
+					object.camera:attach(0,0, GAME_WIDTH, GAME_HEIGHT)
+					object:draw()
+					object.camera:detach()
+				end
+			else
+				local x, y, w, h = 0,0,GAME_WIDTH,GAME_HEIGHT
+				if object.alwaysDraw or is_in_bounds(object, x,y,w,h) then
+					object:draw()
+				end
 			end
 		end
 	end

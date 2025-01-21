@@ -60,6 +60,7 @@ require(OBJECTS_PATH..".tilemap.tileset")
 require(OBJECTS_PATH..".tilemap.tile")
 require(OBJECTS_PATH..".tilemap.level")
 require(OBJECTS_PATH..".entities.player")
+require(OBJECTS_PATH..".ui.mamonoro.timer")
 
 -- STATES
 local STATE_PATH = "src.states"

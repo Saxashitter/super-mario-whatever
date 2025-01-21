@@ -9,6 +9,7 @@ local RUN_ACCEL = .23
 local SKID_DECEL = .32
 local DECEL = .09
 local JUMP_HEIGHT = 4
+local AIR_SKID_DECEL = .15
 
 local WALL_WIDTH = 4
 local WALL_HEIGHT = 5
@@ -133,6 +134,9 @@ function state:physics()
 		elseif dir == -movedir
 		and self:isOnGround() then
 			accel = SKID_DECEL
+		elseif dir == -movedir
+		and not self:isOnGround() then
+			accel = AIR_SKID_DECEL
 		end
 
 		if Controls:down("run") then
@@ -150,9 +154,10 @@ function state:physics()
 	end
 
 	if math.abs(self.momx) > WALK_SPEED
-	and Controls:down("run") then
+	and Controls:down("run")
+	and self:isOnGround() then
 		self.runTime = math.min(self.runTime + (1/60), Player.runTime)
-	elseif self:isOnGround()
+	elseif not self:isOnGround()
 	or not Controls:down("run") then
 		self.runTime = 0
 	end
@@ -164,7 +169,7 @@ function state:physics()
 	end
 
 	if not self:isOnGround() then
-		self.momy = self.momy + gravity
+		self.momy = math.min(self.momy + gravity, gravity*20)
 	end
 
 	if self:isOnGround() then

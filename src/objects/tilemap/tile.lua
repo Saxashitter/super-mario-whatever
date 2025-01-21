@@ -10,11 +10,7 @@ function Tile:new(x, y, tile, tileset)
 	self.tileset = tileset
 	self.tile = tile
 
-	if self.tile.collide == "true" then
-		print "YAY HITBOX"
-	end
-
-	self:super(x, y, self.tile.collide ~= "true")
+	self:super(x, y, true)
 end
 
 function Tile:physics() end
