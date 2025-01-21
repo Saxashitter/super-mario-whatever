@@ -35,6 +35,18 @@ function GameObject:draw()
 	love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
 end
 
+function GameObject:resize(width, height)
+	local ox = self.width - width
+	local oy = self.height - height
+
+	self.width = width
+	self.height = height
+
+	self.x = self.x+ox
+	self.y = self.y+oy
+	World:update(self, self.x, self.y, self:defineShape())
+end
+
 function GameObject:isOnGround()
 	return self:getGroundContactInfo() == true
 end

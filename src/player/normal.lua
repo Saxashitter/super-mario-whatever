@@ -1,7 +1,7 @@
 local state = {}
 
 local WALK_SPEED = 1.6
-local MIN_WALK_SPEED = .5
+local MIN_WALK_SPEED = .8
 local RUN_SPEED = 3.4
 local MAX_RUN_SPEED = 4.2
 local WALK_ACCEL = .17
@@ -157,9 +157,11 @@ function state:physics()
 	and Controls:down("run")
 	and self:isOnGround() then
 		self.runTime = math.min(self.runTime + (1/60), Player.runTime)
-	elseif not self:isOnGround()
-	or not Controls:down("run") then
-		self.runTime = 0
+	else
+		if self:isOnGround()
+		or not Controls:down("run") then
+			self.runTime = 0
+		end
 	end
 
 	local gravity = GRAVITY

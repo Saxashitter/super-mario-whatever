@@ -5,6 +5,7 @@ local STOP_SPEED = 0.2
 
 function state:enter()
 	self.animation.speed = 1
+	self:resize(24, 8)
 	self.animation:switch"slide"
 end
 
@@ -13,6 +14,7 @@ function state:physics()
 	print "slide"
 
 	if math.abs(self.momx) < STOP_SPEED then
+		self:resize(Player.width, Player.height)
 		self:changeState("normal")
 		return
 	end
