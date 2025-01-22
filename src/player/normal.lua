@@ -106,7 +106,7 @@ function state:physics()
 	end
 
 	if Controls:down("down")
-	and self.momx > WALK_SPEED then
+	and math.abs(self.momx) > WALK_SPEED then
 		self:changeState("slide")
 	end
 

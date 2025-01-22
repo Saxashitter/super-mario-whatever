@@ -13,7 +13,8 @@ function state:physics()
 	self.momx = mathx.approach(self.momx, 0, SLIDE_DECEL)
 	print "slide"
 
-	if math.abs(self.momx) < STOP_SPEED then
+	if math.abs(self.momx) < STOP_SPEED
+	or not Controls:down("down") then
 		self:resize(Player.width, Player.height)
 		self:changeState("normal")
 		return

@@ -12,6 +12,8 @@ Player.height = 24
 Player.character = "mario"
 Player.runTime = 1.9
 
+local palette = love.graphics.newShader("src/shaders/paletteSwap.glsl")
+
 local GRID_SIZE = 48
 
 function Player:new(x, y)
@@ -28,6 +30,8 @@ function Player:new(x, y)
 		{name = "slide", frames = {{2,4}}, fps = 1},
 	})
 
+	self:setPalette("default")
+
 	self:super(x, y)
 
 	self.runTime = 0
@@ -36,6 +40,27 @@ function Player:new(x, y)
 	if self.state
 	and self.state.enter then
 		self.state.enter(self)
+	end
+end
+
+function Player:setPalette(name)
+	local paletteData = love.image.newImageData("assets/images/translations/mario_"..name..".png")
+
+	self.colors = {}
+	self.convertColors = {}
+
+	for y = 0,63 do
+		local r1,g1,b1,a1 = 0,0,0,1
+		local r2,g2,b2,a2 = 0,0,0,1
+
+		if y < paletteData:getHeight() then
+			r1,g1,b1,a1 = paletteData:getPixel(0, y)
+			r2,g2,b2,a2 = paletteData:getPixel(1, y)
+			print "set colors"
+		end
+
+		self.colors[y+1] = {r1,g1,b1,a1}
+		self.convertColors[y+1] = {r2,g2,b2,a2}
 	end
 end
 
@@ -78,15 +103,20 @@ function Player:draw()
 	local ox = self.width/2*math.cos(rot)
 	local oy = self.height*math.sin(rot)
 
-	self.animation:draw(
-		self.x + ox,
-		self.y + self.height - oy,
-		rot,
-		self.dir,
-		1,
-		GRID_SIZE/2,
-		GRID_SIZE
-	)
+	palette:send("colors", unpack(self.colors))
+	palette:send("convertColors", unpack(self.convertColors))
+
+	love.graphics.setShader(palette)
+		self.animation:draw(
+			self.x + ox,
+			self.y + self.height - oy,
+			rot,
+			self.dir,
+			1,
+			GRID_SIZE/2,
+			GRID_SIZE
+		)
+	love.graphics.setShader()
 
 	if DEBUG then
 		GameObject.draw(self)
