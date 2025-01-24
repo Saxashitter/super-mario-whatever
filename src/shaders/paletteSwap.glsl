@@ -6,15 +6,9 @@ vec4 effect(vec4 color, sampler2D tex, vec2 texture_coords, vec2 screen_coords) 
 	int length = 63;
 
 	for(int i=0;i<length;i++) {
-		int j = i;
-
-		if (pixel.a == 0.0)
-			return pixel;
-
-		if (distance(pixel.r, colors[j].r) < 0.01
-		&& distance(pixel.g, colors[j].g) < 0.01
-		&& distance(pixel.b, colors[j].b) < 0.01
-		&& distance(pixel.a, colors[j].a) < 0.01)
-			return convertColors[j];
+		if (distance(pixel, colors[i]) < 0.01)
+			return convertColors[i];
 	}
+
+	return pixel;
 }

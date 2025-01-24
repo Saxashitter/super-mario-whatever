@@ -9,6 +9,7 @@ local RUN_ACCEL = .23
 local SKID_DECEL = .32
 local DECEL = .09
 local JUMP_HEIGHT = 4
+local RUN_JUMP_HEIGHT = 5
 local AIR_SKID_DECEL = .15
 
 local WALL_WIDTH = 4
@@ -17,6 +18,7 @@ local WALL_HEIGHT = 5
 function state:enter()
 	self.jump_press = false
 	self.jumped = false
+	self.crouch = false
 end
 
 local function handle_animation(self)
@@ -24,17 +26,26 @@ local function handle_animation(self)
 
 	if not self:isOnGround() then
 		self.animation.speed = 1
-		if self.animation.name ~= "jump"
-		and self.animation.name ~= "walljump" then
-			self.animation:switch"jump"
+		if self.crouched then
+			if self.animation.active ~= "crouch" then
+				self.animation:switch "crouch"
+			end
+			return
+		end
+		if self.animation.active ~= "jump1"
+		and self.animation.active ~= "walljump" then
+			self.animation:switch"jump1"
 		end
 
 		return
 	end
 
-	if math.abs(self.momx) > 0 then
+	if self.crouched then
+		animName = "crouch"
+		self.animation.speed = 1
+	elseif math.abs(self.momx) > 0 then
 		animName = "walk"
-		self.animation.speed = math.abs(self.momx) / WALK_SPEED
+		self.animation.speed = (math.abs(self.momx) / WALK_SPEED) / 1.25
 		self.dir = mathx.sign(self.momx)
 	else
 		self.animation.speed = 1
@@ -44,7 +55,7 @@ local function handle_animation(self)
 		animName = "run"
 	end
 
-	if self.animation.name ~= animName then
+	if self.animation.active ~= animName then
 		self.animation:switch(animName)
 	end
 end
@@ -83,8 +94,14 @@ function state:physics()
 		local wall, dir = is_at_wall(self)
 
 		if self:isOnGround() then
+			local height = JUMP_HEIGHT
+
+			if self.runTime == Player.runTime then
+				height = RUN_JUMP_HEIGHT
+			end
+
 			self.jumped = true
-			self.momy = -JUMP_HEIGHT
+			self.momy = -height
 		elseif wall then
 			local speed = math.max(WALK_SPEED*2.25, math.abs(self.momx))
 
@@ -105,9 +122,12 @@ function state:physics()
 		end
 	end
 
-	if Controls:down("down")
-	and math.abs(self.momx) > WALK_SPEED then
-		self:changeState("slide")
+	if Controls:down("down") then
+		if math.abs(self.momx) > WALK_SPEED then
+			self:changeState("slide")
+		else
+			self:changeState("crouch")
+		end
 	end
 
 	local dir = 0

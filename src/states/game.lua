@@ -2,46 +2,23 @@ GameState = class{name = "GameState", extends = State}
 
 local map = require "assets.data.maps.test"
 
-local function CAMERA_POS(self)
-	local width, height = self.player.width/2, self.player.height/2
-	local x, y = self.player.x, self.player.y
+local function cameraThink(self)
+	local x_speed = 4
+	local x_offset = 0
 
-	x = x + width
-	y = y + height
-
-	local scale = GAME_SCALE
-
-	local cam = self.level:isInCamera(self.player)
-	local inCam = false
-	if cam then
-		if self.cameraLockIn ~= cam then
-			self.cameraEase = 0
-		end
-
-		self.cameraLockIn = cam
-		inCam = true
+	if math.abs(self.player.momx) > 3.4 then
+		x_speed = 2
+		x_offset = 100*mathx.sign(self.player.momx)
 	end
 
-	local cam = self.cameraLockIn
+	self.gameCamera.offset.x = mathx.approach(self.gameCamera.offset.x, x_offset, x_speed)
 
-	local cs = math.max(GAME_WIDTH / cam.width, GAME_HEIGHT / cam.height)
-	local gw, gh = GAME_WIDTH / cs, GAME_HEIGHT / cs
-	local cx = math.max(cam.x+(gw/2), math.min(x, cam.x+cam.width-(gw/2)))
-	local cy = math.max(cam.y+(gh/2), math.min(y, cam.y+cam.height-(gh/2)))
-
-	if inCam then
-		self.cameraEase = mathx.lerp(self.cameraEase, 1, 0.1)
-	else
-		self.cameraEase = mathx.lerp(self.cameraEase, 0, 0.1)
+	if self.player:isOnGround() then
+		self.gameCamera.y = mathx.approach(self.gameCamera.y, self.player.y+(self.player.height/2), 1)
 	end
-
-	local changeX = cx - x
-	local changeY = cy - y
-	local changeS = cs - scale
-
-	return Ease.linear(self.cameraEase, x, changeX, 1),
-		Ease.linear(self.cameraEase, y, changeY, 1),
-		Ease.linear(self.cameraEase, scale, changeS, 1)
+	if self.player.momx == 0 then
+		self.gameCamera.x = mathx.approach(self.gameCamera.x, self.player.x+(self.player.width/2), 1)
+	end
 end
 
 function GameState:new()
@@ -52,6 +29,7 @@ function GameState:new()
 	self.cameraEase = 0
 
 	self.gameCamera = Camera()
+	self.gameCamera:setDeadzone(32, 48)
 	self.gameCamera.scale = GAME_SCALE
 
 	self.hudCamera = Camera(GAME_WIDTH/2, GAME_HEIGHT/2)
@@ -68,7 +46,8 @@ function GameState:new()
 	self.player.camera = self.gameCamera
 	self:add(self.player)
 
-	self.gameCamera.x, self.gameCamera.y, self.gameCamera.scale = CAMERA_POS(self)
+	self.gameCamera.follow = self.player
+	self:add(self.gameCamera)
 
 	self.timer = MamoruTimer(0, 128)
 	self:add(self.timer)
@@ -78,6 +57,5 @@ end
 
 function GameState:update(dt)
 	State.update(self, dt)
-
-	self.gameCamera.x, self.gameCamera.y, self.gameCamera.scale = CAMERA_POS(self)
+	cameraThink(self)
 end
