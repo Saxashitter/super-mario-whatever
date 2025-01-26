@@ -16,5 +16,7 @@ end
 function Tile:physics() end
 
 function Tile:draw()
-	love.graphics.draw(self.tileset.image, self.tile.quad, self.x, self.y)
+	love.graphics.draw(self.tileset.image, self.tile.quad,
+		math.floor(self.x),
+		math.floor(self.y))
 end

@@ -1,7 +1,5 @@
 GameState = class{name = "GameState", extends = State}
 
-local map = require "assets.data.maps.test"
-
 local function cameraThink(self)
 	local x_speed = 4
 	local x_offset = 0
@@ -16,13 +14,11 @@ local function cameraThink(self)
 	if self.player:isOnGround() then
 		self.gameCamera.y = mathx.approach(self.gameCamera.y, self.player.y+(self.player.height/2), 1)
 	end
-	if self.player.momx == 0 then
-		self.gameCamera.x = mathx.approach(self.gameCamera.x, self.player.x+(self.player.width/2), 1)
-	end
 end
 
-function GameState:new()
+function GameState:new(map)
 	-- reinitialize world to fit world boundaries
+	local map = require("assets.data.maps."..map)
 	self:super()
 
 	self.cameraLockIn = {x = 0, y = 0, width = GAME_WIDTH, height = GAME_HEIGHT, scale = GAME_SCALE}
@@ -31,26 +27,47 @@ function GameState:new()
 	self.gameCamera = Camera()
 	self.gameCamera:setDeadzone(32, 48)
 	self.gameCamera.scale = GAME_SCALE
+	self:addViewport(self.gameCamera)
 
 	self.hudCamera = Camera(GAME_WIDTH/2, GAME_HEIGHT/2)
+	self:addViewport(self.hudCamera)
 
 	self.level = Level(0, 0, map)
-	self.level.camera = self.gameCamera
-	for k,v in pairs(self.level.objects) do
-		v.camera = self.gameCamera
-		self:add(v)
-	end
 	self:add(self.level)
+	self:bindObjectToViewport(self.gameCamera, self.level)
+	self.level.camera = self.gameCamera
 
-	self.player = Player(0, 0)
-	self.player.camera = self.gameCamera
+	self.gameCamera:setArea(
+		self.level.x,
+		self.level.y,
+		self.level.width*self.level.tilewidth,
+		self.level.height*self.level.tileheight)
+
+	local player_x, player_y = 0,0
+	if self.level.markers.player_pos then
+		player_x = self.level.markers.player_pos[1].x-(Player.width/2)
+		player_y = self.level.markers.player_pos[1].y-(Player.height)
+	end
+
+	self.player = Player(player_x, player_y)
 	self:add(self.player)
+	self:bindObjectToViewport(self.gameCamera, self.player)
+
+	self.gameCamera.x = self.player.x+(self.player.width/2)
+	self.gameCamera.y = self.player.y+(self.player.height/2)
 
 	self.gameCamera.follow = self.player
-	self:add(self.gameCamera)
 
-	self.timer = MamoruTimer(0, 128)
+	self.timer = MamoruTimer(0, 0)
 	self:add(self.timer)
+	self:bindObjectToViewport(self.hudCamera, self.timer)
+
+	self.music = love.audio.newSource(
+		"assets/music/"..(self.level.properties.music or "mamoru/SacredTree")..".ogg",
+		"stream"
+	)
+	self.music:setLooping(true)
+	self.music:play()
 
 	World:optimize()
 end

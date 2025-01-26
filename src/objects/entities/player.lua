@@ -6,6 +6,7 @@ Player.states = {
 	normal = require "src.player.normal",
 	slide = require "src.player.slide",
 	crouch = require "src.player.crouch",
+	longjump = require "src.player.longjump",
 }
 Player.state = Player.states.normal
 Player.width = 10
@@ -18,8 +19,8 @@ local palette = love.graphics.newShader("src/shaders/paletteSwap.glsl")
 local GRID_SIZE = 48
 
 function Player:new(x, y)
-	self.animation = Aseprite("assets/images/aseprite/mario.aseprite")
-	self:setPalette("deargodhesblack")
+	self.animation = Aseprite("assets/images/aseprite/MarioSheet.aseprite")
+	self:setPalette("default")
 	self:super(x, y)
 
 	self.runTime = 0

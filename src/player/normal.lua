@@ -7,9 +7,11 @@ local MAX_RUN_SPEED = 4.2
 local WALK_ACCEL = .17
 local RUN_ACCEL = .23
 local SKID_DECEL = .32
+local AIR_ACCEL = .1
 local DECEL = .09
+local AIR_DECEL = .065
 local JUMP_HEIGHT = 4
-local RUN_JUMP_HEIGHT = 5
+local RUN_JUMP_HEIGHT = 4.25
 local AIR_SKID_DECEL = .15
 
 local WALL_WIDTH = 4
@@ -49,6 +51,9 @@ local function handle_animation(self)
 		self.dir = mathx.sign(self.momx)
 	else
 		self.animation.speed = 1
+		if Controls:down("up") then
+			animName = "rolling"
+		end
 	end
 
 	if math.abs(self.momx) > RUN_SPEED then
@@ -87,16 +92,13 @@ local function is_at_wall(self)
 end
 
 function state:physics()
-	if Controls:down("jump")
-	and not self.jump_press then
-		self.jump_press = true
-
+	if Controls:pressed("jump") then
 		local wall, dir = is_at_wall(self)
 
 		if self:isOnGround() then
 			local height = JUMP_HEIGHT
 
-			if self.runTime == Player.runTime then
+			if math.abs(self.momx) > RUN_SPEED then
 				height = RUN_JUMP_HEIGHT
 			end
 
@@ -109,24 +111,14 @@ function state:physics()
 			self.momx = speed*self.dir
 			self.momy = -JUMP_HEIGHT
 			self.jumped = true
+			self.animation:switch "walljump"
 		end
 	end
 
-	if not Controls:down("jump")
-	and self.jump_press then
-		self.jump_press = false
-
+	if not Controls:down("jump") then
 		if self.jumped
 		and not self:isOnGround() then
 			self.jumped = false
-		end
-	end
-
-	if Controls:down("down") then
-		if math.abs(self.momx) > WALK_SPEED then
-			self:changeState("slide")
-		else
-			self:changeState("crouch")
 		end
 	end
 
@@ -149,24 +141,31 @@ function state:physics()
 		local accel = WALK_ACCEL
 		local speed = WALK_SPEED
 
-		if dir == 0 then
-			accel = DECEL
-		elseif dir == -movedir
-		and self:isOnGround() then
-			accel = SKID_DECEL
-		elseif dir == -movedir
-		and not self:isOnGround() then
-			accel = AIR_SKID_DECEL
-		end
-
 		if Controls:down("run") then
 			speed = RUN_SPEED
-			if dir == movedir then
-				accel = RUN_ACCEL
-			end
+			accel = RUN_ACCEL
 
 			if self.runTime == Player.runTime then
 				speed = MAX_RUN_SPEED
+			end
+		end
+
+		if not self:isOnGround() then
+			accel = AIR_ACCEL
+		end
+
+		if dir == 0 then
+			if self:isOnGround() then
+				accel = DECEL
+			else
+				accel = AIR_DECEL
+			end
+		end
+		if dir == -movedir then
+			if self:isOnGround() then
+				accel = SKID_DECEL
+			else
+				accel = AIR_SKID_DECEL
 			end
 		end
 		
@@ -193,9 +192,8 @@ function state:physics()
 	if not self:isOnGround() then
 		self.momy = math.min(self.momy + gravity, gravity*20)
 	end
-
-	if self:isOnGround() then
-		self.momy = math.min(self.momy, 0)
+	if self:isWallBlocking(self.momx) then
+		self.momx = 0
 	end
 
 	self:move()
@@ -203,6 +201,16 @@ function state:physics()
 	if self:isOnGround()
 	and self.jumped then
 		self.jumped = false
+	end
+
+	if Controls:down("down")
+	and self:isOnGround() then
+		local state = "crouch"
+		if math.abs(self.momx) > WALK_SPEED then
+			state = "slide"
+		end
+
+		self:changeState(state)
 	end
 end
 

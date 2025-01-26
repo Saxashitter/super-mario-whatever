@@ -7,9 +7,24 @@ GameObject.height = 8
 GameObject.alwaysDraw = false
 
 function GameObject:defineShape()
+	--[[if self.height >= self.width then
+		return Slick.newShapeGroup(
+			Slick.newCircleShape(self.width/2, 0, self.width/2),
+			Slick.newRectangleShape(0, self.width/2, self.width, (self.height - self.width/2) - self.width/2),
+			Slick.newCircleShape(self.width/2, self.height-self.width/2, self.width/2)
+		)
+	end]]
+
+	local circ = math.min(self.width, self.height)/4
+
 	return Slick.newShapeGroup(
-		Slick.newRectangleShape(0,0,self.width,self.height - self.width/ 2),
-		Slick.newCircleShape(self.width / 2,self.height - self.width / 2,self.width / 2)
+		Slick.newCircleShape(circ, circ, circ),
+		Slick.newCircleShape(self.width-circ, circ, circ),
+		Slick.newCircleShape(circ, self.height-circ, circ),
+		Slick.newCircleShape(self.width-circ, self.height-circ, circ),
+		Slick.newRectangleShape(circ, 0, self.width-(circ*2), circ),
+		Slick.newRectangleShape(0, circ, self.width, self.height-(circ*2)),
+		Slick.newRectangleShape(circ, self.height-circ, self.width-(circ*2), circ)
 	)
 end
 
@@ -36,7 +51,7 @@ function GameObject:draw()
 end
 
 function GameObject:resize(width, height)
-	local ox = self.width - width
+	local ox = (self.width - width)/2
 	local oy = self.height - height
 
 	self.width = width
@@ -44,7 +59,7 @@ function GameObject:resize(width, height)
 
 	self.x = self.x+ox
 	self.y = self.y+oy
-	World:update(self, self.x, self.y, self:defineShape())
+	self.x, self.y = World:update(self, self.x, self.y, self:defineShape())
 end
 
 function GameObject:isOnGround()
@@ -92,10 +107,6 @@ end
 
 function GameObject:move()
 	local isWallBlocking = self:isWallBlocking(self.momx)
-	if isWallBlocking then
-		self.momx = 0
-	end
-
 	local isOnGround, groundNormalX, groundNormalY = self:getGroundContactInfo()
 
 	local goalX, goalY
@@ -130,11 +141,11 @@ function GameObject:move()
 	local actualX, actualY, cols, len = World:check(self, goalX, goalY)
 
 	local hitGround = false
-	if len > 0 and not isOnGround then
+	if len > 0 then
 		for i = 1, len do
 			local col = cols[i]
 
-			if math.abs(col.normal.y) > 0 then
+			if math.abs(col.normal.y) > math.abs(col.normal.x) then
 				if not hitGround and self.momy > 0 then					
 					hitGround = true
 					
@@ -150,6 +161,8 @@ function GameObject:move()
 				end
 
 				self.momy = 0
+			else
+				self.momx = 0
 			end
 		end
 	end

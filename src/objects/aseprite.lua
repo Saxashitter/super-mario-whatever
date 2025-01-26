@@ -94,5 +94,4 @@ function Aseprite:draw(...)
 		(varargs[7] or 0) - frame.box.y
 	}
 	love.graphics.draw(self.frames[self.index].image, unpack(args))
-	print(frame.box.x, frame.box.y, frame.box.width, frame.box.height)
 end

@@ -20,6 +20,9 @@ function love.load()
 	}
 	canvas = love.graphics.newCanvas(GAME_WIDTH, GAME_HEIGHT)
 
+	World = Slick.newWorld(GAME_WIDTH, GAME_HEIGHT)
+	CurrentState = StateMachine(MissionSelect())
+
     if DEBUG then
         local loadTimeEnd = love.timer.getTime()
         local loadTime = (loadTimeEnd - loadTimeStart)
@@ -87,6 +90,13 @@ function love.keypressed(key, code, isRepeat)
     if not RELEASE and code == "`" then
         DEBUG = not DEBUG
     end
+end
+
+function love.touchpressed(id)
+	Controls:touchpressed(id)
+end
+function love.touchreleased(id)
+	Controls:touchreleased(id)
 end
 
 function love.run()

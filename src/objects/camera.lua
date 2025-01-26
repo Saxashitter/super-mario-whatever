@@ -6,8 +6,8 @@ Camera.rot = 0
 Camera.scale = 1
 Camera.deadzone = {x = 0, y = 0}
 Camera.offset = {x = 0, y = 0}
-Camera.area = {x = 0, y = 0, x2 = 0, y2 = 0, enabled = false}
-Camera.noclip = true
+Camera.area = {x = 0, y = 0, x2 = 0, y2 = 0}
+Camera.noclip = false
 
 function Camera:new(x, y)
 	self.x = x or 0
@@ -15,15 +15,14 @@ function Camera:new(x, y)
 
 	self.deadzone = {x=0, y=0}
 	self.offset = {x=0, y=0}
-	self.area = {x=0, y=0, x2=0, y2=0, enabled=false}
-end
-
-function Camera:follow(object)
-	self.follow = object
+	self.area = {x=0, y=0, x2=0, y2=0}
 end
 
 function Camera:setDeadzone(x, y)
 	self.deadzone = {x=x, y=y, enabled=true}
+end
+function Camera:setArea(x, y, x2, y2)
+	self.area = {x=x, y=y, x2=x2, y2=y2}
 end
 
 function Camera:update()
@@ -32,16 +31,16 @@ function Camera:update()
 
 		if self.deadzone.enabled then
 			if follow.x < self.x-self.deadzone.x then
-				self.x = follow.x+self.deadzone.x
+				self.x = math.floor(follow.x+self.deadzone.x)
 			end
 			if follow.x+follow.width > self.x+self.deadzone.x then
-				self.x = follow.x+follow.width-self.deadzone.x
+				self.x = math.ceil(follow.x+follow.width-self.deadzone.x)
 			end
 			if follow.y < self.y-self.deadzone.y then
-				self.y = follow.y+self.deadzone.y
+				self.y = math.floor(follow.y+self.deadzone.y)
 			end
 			if follow.y+follow.height > self.y+self.deadzone.y then
-				self.y = follow.y+follow.height-self.deadzone.y
+				self.y = math.ceil(follow.y+follow.height-self.deadzone.y)
 			end
 		else
 			self.x = follow.x+(follow.width/2)
@@ -65,8 +64,8 @@ function Camera:getPosition()
 		screenWidth = GAME_WIDTH*0.5/scale
 		screenHeight = GAME_HEIGHT*0.5/scale
 
-		x = clamp(x, self.area.x+screenWidth, self.area.x2-screenWidth)
-		y = clamp(y, self.area.y+screenHeight, self.area.y2-screenHeight)
+		x = mathx.clamp(x, self.area.x+screenWidth, self.area.x2-screenWidth)
+		y = mathx.clamp(y, self.area.y+screenHeight, self.area.y2-screenHeight)
 	end
 
 	return x, y, scale

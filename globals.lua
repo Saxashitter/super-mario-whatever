@@ -12,15 +12,11 @@ PHYSICS_RATE = 1/60
 DEBUG = true
 
 require("lib.batteries"):export()
-Slick = require "lib.slick"
 Baton = require "lib.baton"
-Lovepad = require "lib.lovepad"
 PrintLib = require "lib.print"
 Ease = require "lib.easing"
+Slick = require "lib.slick"
 
 require("src.objects")
 require("src.states")
 require("src.controls")
-
--- GAMESTATE
-CurrentState = StateMachine(GameState)

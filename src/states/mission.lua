@@ -7,14 +7,14 @@ MissionSelect.stages = {
 		path = "test",
 		icon = "stage1",
 		cleared = false,
-		dialogue = {portrait = "neutral", dialogue = "i am fululu higokudani"}
+		dialogue = {portrait = {1,1}, dialogue = "i am fululu higokudani"}
 	},
 	{
 		name = "Test 2",
-		path = "test",
+		path = "test2",
 		icon = "stage2",
 		cleared = true,
-		dialogue = {portrait = "cheer", dialogue = "i am still fululu higokudani"}
+		dialogue = {portrait = {2,1}, dialogue = "i am still fululu higokudani"}
 	}
 }
 MissionSelect.current = 1
@@ -25,6 +25,11 @@ local SELECTED_X = 50
 function MissionSelect:new()
 	self:super()
 
+	-- music
+	self.music = love.audio.newSource("assets/music/mamoru/SacredTree.ogg", "stream")
+	self.music:setLooping(true)
+	self.music:play()
+
 	-- background
 	self.background = Sprite("assets/images/ui/parallax/mamonoro_mission.png", 0,0)
 	self.background.momx = -1
@@ -32,7 +37,9 @@ function MissionSelect:new()
 	self.background.parallax = true
 
 	-- stage select
-	self.stageSelect = Sprite("assets/images/ui/missions/stageSelect.png", 10,10)
+	self.stageSelect = Sprite("assets/images/ui/missions/stageSelect.png", 0,0)
+	self.stageSelect.x = 100
+	self.stageSelect.y = 80
 	self.stageSelect.scale = self.MAMONORO_SCALE
 
 	-- stages
@@ -56,7 +63,7 @@ function MissionSelect:new()
 	local groupWidth = (self.box.width+offset+self.frame.width)*self.MAMONORO_SCALE
 
 	self.frame.x = (GAME_WIDTH/2)-(groupWidth/2)
-	self.frame.y = GAME_HEIGHT - (self.frame.height*self.frame.scale) - 10
+	self.frame.y = GAME_HEIGHT - (self.frame.height*self.frame.scale) - 60
 
 	self.box.x = self.frame.x+((self.frame.width+offset)*self.MAMONORO_SCALE)
 	self.box.y = self.frame.y
@@ -81,14 +88,66 @@ end
 function MissionSelect:update(dt)
 	State.update(self, dt)
 
+	local dir = 0
+	if Controls:pressed"left" then
+		dir = dir - 1
+	end
+	if Controls:pressed"right" then
+		dir = dir + 1
+	end
+	self:change(dir)
+
 	for i,sprite in pairs(self.stageDisplays) do
 		sprite.x = mathx.lerp(
 			sprite.x,
 			i == self.current and SELECTED_X or UNSELECTED_X,
 			0.25)
 	end
+
+	if Controls:pressed("jump") then
+		local state = GameState(self.stages[self.current].path)
+
+		CurrentState:change(state)
+	end
+end
+
+function MissionSelect:change(i)
+	if i == 0 then return end
+
+	self.current = mathx.clamp(self.current+i, 1, #self.stages)
+	local data = self.stages[self.current]
+
+	self.fululu:setQuad(unpack(data.dialogue.portrait))
+end
+
+function MissionSelect:exit()
+	self.music:stop()
 end
 
 function MissionSelect:draw()
 	State.draw(self)
+	local scale = 2
+	local width = (self.box.width*self.box.scale - 32)/scale
+	local text = self.stages[self.current].dialogue.dialogue
+
+	love.graphics.setColor(0,0,0,1)
+	love.graphics.printf(
+		text,
+		self.box.x+16-scale,
+		self.box.y+16-scale,
+		width,
+		"left",
+		0,
+		scale,
+		scale)
+	love.graphics.setColor(1,1,1,1)
+	love.graphics.printf(
+		text,
+		self.box.x+16,
+		self.box.y+16,
+		width,
+		"left",
+		0,
+		scale,
+		scale)
 end

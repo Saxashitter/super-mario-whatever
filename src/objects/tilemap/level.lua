@@ -6,7 +6,6 @@ Level = class({
 local parsers = {
 	tilelayer = function(self, map_lua, layer)
 		for i,id in pairs(layer.data) do
-
 			if id > 0 then
 				local tileset,tileid
 				-- find what tileset this belongs to
@@ -24,10 +23,14 @@ local parsers = {
 					error "No tileset!"
 				end
 
-				local x = math.floor((i - 1) % map_lua.width) * map_lua.tilewidth
-				local y = math.floor((i - 1) / map_lua.width) * map_lua.tileheight
+				local x = math.floor((i - 1) % map_lua.width)
+				local y = math.floor((i - 1) / map_lua.width)
 
-				table.insert(self.objects, tileset:createTile(tileid, x, y))
+				if not self.tiles[y] then
+					self.tiles[y] = {}
+				end
+				self.tiles[y][x] = tileset:createTile(tileid, x*self.tilewidth, y*self.tileheight)
+				-- TODO: add layer support, which should be easy
 			end
 		end
 	end,
@@ -39,6 +42,15 @@ local parsers = {
 					y = object.y,
 					width = object.width,
 					height = object.height
+				})
+			elseif object.name == "marker" then
+				if not self.markers[object.type] then
+					self.markers[object.type] = {}
+				end
+	
+				table.insert(self.markers[object.type], {
+					x = object.x,
+					y = object.y
 				})
 			else
 				if object.shape == "rectangle" then
@@ -74,8 +86,10 @@ function Level:new(x, y, map_lua)
 	self.height = map_lua.height
 	self.tilewidth = map_lua.tilewidth
 	self.tileheight = map_lua.tileheight
+	self.properties = map_lua.properties
 	self.tilesets = {}
-	self.objects = {}
+	self.tiles = {}
+	self.markers = {}
 
 	self.cameras = {}
 	self.boxes = {}
@@ -100,6 +114,37 @@ function Level:update(dt) end
 function Level:physics() end
 
 function Level:draw()
+	local x,y,w,h = 0,0,GAME_WIDTH,GAME_HEIGHT
+
+	if self.camera then
+		local scale
+		x, y, scale = self.camera:getPosition()
+		w, h = GAME_WIDTH/scale, GAME_HEIGHT/scale
+	
+		x = x-w/2
+		y = y-h/2
+	end
+
+	local x1 = math.floor(x/self.tilewidth)
+	local y1 = math.floor(x/self.tileheight)
+	local x2 = math.floor((x+w)/self.tilewidth)
+	local y2 = math.floor((y+h)/self.tileheight)
+
+	--[[for y = y1, y2 do
+		if self.tiles[y] then
+			for x = x1, x2 do
+				if self.tiles[y][x] then
+					self.tiles[y][x]:draw()
+				end
+			end
+		end
+	end]]
+	for y,t in pairs(self.tiles) do
+		for x,t in pairs(t) do
+			t:draw()
+		end
+	end
+
 	if not DEBUG then return end
 
 	for k,v in pairs(self.boxes) do
