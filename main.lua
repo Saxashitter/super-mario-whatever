@@ -1,54 +1,45 @@
-local loadTimeStart = love.timer.getTime()
+require "lib.MathX"
+Class = require "lib.Classic"
+local Maid64 = require "lib.Maid64"
+local PrintLib = require "lib.Print"
 
-require 'globals'
+local Controls = require "src.objects.backend.Controls"
 
-local RS = require "lib.resolution_solution"
-local canvas
+--
 
-love.resize = function()
-  RS.resize()
+DEBUG = true
+GAME_SCALE = 4
+GAME_WIDTH = 256 * GAME_SCALE
+GAME_HEIGHT = 224 * GAME_SCALE
+
+function switchState(newState, ...)
+	state = newState
+	newState:enter(...)
 end
 
+--
+
 function love.load()
-	love.graphics.setDefaultFilter("nearest", "nearest", 1)
-	love.graphics.setLineStyle("rough")
+	love.graphics.setDefaultFilter("nearest")
+	Maid64.setup(GAME_WIDTH, GAME_HEIGHT)
+	Controls:init()
 
-	RS.conf{
-		game_width = GAME_WIDTH,
-		game_height = GAME_HEIGHT,
-		scale_mode = 1
-	}
-	canvas = love.graphics.newCanvas(GAME_WIDTH, GAME_HEIGHT)
-
-	World = Slick.newWorld(GAME_WIDTH, GAME_HEIGHT)
-	CurrentState = StateMachine(MissionSelect())
-
-    if DEBUG then
-        local loadTimeEnd = love.timer.getTime()
-        local loadTime = (loadTimeEnd - loadTimeStart)
-        print(("Loaded game in %.3f seconds."):format(loadTime))
-    end
+	switchState((require "src.states.Play")())
 end
 
 function love.update(dt)
 	Controls:update(dt)
-	CurrentState:update(dt)
+	state:update(dt)
 	PrintLib.update(dt)
 end
 
 function love.draw()
-	love.graphics.setCanvas(canvas)
-	love.graphics.clear(0,0,0,1)
-
 	local drawTimeStart = love.timer.getTime()
-	CurrentState:draw()
+	Maid64.start()
+	state:draw()
+	Maid64.finish()
 	local drawTimeEnd = love.timer.getTime()
 	local drawTime = drawTimeEnd - drawTimeStart
-
-	love.graphics.setCanvas()
-	RS.push()
-		love.graphics.draw(canvas)
-	RS.pop()
 
 	if DEBUG then
 		love.graphics.push()
@@ -64,19 +55,19 @@ function love.draw()
 		memoryUnit = "MB"
 
 		local info = {
-		    "FPS: " .. ("%3d"):format(love.timer.getFPS()),
-		    "DRAW: " .. ("%7.3fms"):format(mathx.round(drawTime * 1000, .001)),
-		    "RAM: " .. string.format("%7.2f", mathx.round(ram, .01)) .. memoryUnit,
-		    "VRAM: " .. string.format("%6.2f", mathx.round(vram, .01)) .. memoryUnit,
-		    "Draw calls: " .. stats.drawcalls,
-		    "Images: " .. stats.images,
-		    "Canvases: " .. stats.canvases,
-		    "\tSwitches: " .. stats.canvasswitches,
-		    "Shader switches: " .. stats.shaderswitches,
-		    "Fonts: " .. stats.fonts,
+			"FPS: " .. ("%3d"):format(love.timer.getFPS()),
+			"DRAW: " .. ("%7.3fms"):format(math.round(drawTime * 1000, .001)),
+			"RAM: " .. string.format("%7.2f", math.round(ram, .01)) .. memoryUnit,
+			"VRAM: " .. string.format("%6.2f", math.round(vram, .01)) .. memoryUnit,
+			"Draw calls: " .. stats.drawcalls,
+			"Images: " .. stats.images,
+			"Canvases: " .. stats.canvases,
+			"\tSwitches: " .. stats.canvasswitches,
+			"Shader switches: " .. stats.shaderswitches,
+			"Fonts: " .. stats.fonts,
 		}
 		for i, text in ipairs(info) do
-			love.graphics.print(text, x, y + (i-1)*dy)
+			love.graphics.print(text, x, y + (i - 1) * dy)
 		end
 
 		PrintLib.draw()
@@ -86,59 +77,6 @@ function love.draw()
 	Controls:draw()
 end
 
-function love.keypressed(key, code, isRepeat)
-    if not RELEASE and code == "`" then
-        DEBUG = not DEBUG
-    end
-end
-
-function love.touchpressed(id)
-	Controls:touchpressed(id)
-end
-function love.touchreleased(id)
-	Controls:touchreleased(id)
-end
-
-function love.run()
-    if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
- 
-    -- We don't want the first frame's dt to include time taken by love.load.
-    if love.timer then love.timer.step() end
-
-    local lag = 0.0
-
-    -- Main loop time.
-    return function()
-        -- Process events.
-        if love.event then
-            love.event.pump()
-            for name, a,b,c,d,e,f in love.event.poll() do
-                if name == "quit" then
-                    if not love.quit or not love.quit() then
-                        return a or 0
-                    end
-                end
-                love.handlers[name](a,b,c,d,e,f)
-            end
-        end
-
-        -- Cap number of Frames that can be skipped so lag doesn't accumulate
-        if love.timer then lag = math.min(lag + love.timer.step(), PHYSICS_RATE * 2) end
-
-        while lag >= PHYSICS_RATE do
-            if love.update then love.update(PHYSICS_RATE) end
-            lag = lag - PHYSICS_RATE
-        end
-
-        if love.graphics and love.graphics.isActive() then
-            love.graphics.origin()
-            love.graphics.clear(love.graphics.getBackgroundColor())
- 
-            if love.draw then love.draw() end
-            love.graphics.present()
-        end
-
-        -- Even though we limit tick rate and not frame rate, we might want to cap framerate at 1000 frame rate as mentioned https://love2d.org/forums/viewtopic.php?f=4&t=76998&p=198629&hilit=love.timer.sleep#p160881
-        if love.timer then love.timer.sleep(0.001) end
-    end
+function love.resize(w, h)
+	Maid64.resize(w, h)
 end
