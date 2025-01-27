@@ -1,4 +1,4 @@
-Camera = class{name = "Camera"}
+local Camera = class{name = "Camera"}
 
 Camera.x = 0
 Camera.y = 0
@@ -88,3 +88,5 @@ function Camera:pop()
 	love.graphics.pop()
 	love.graphics.setScissor(self._sx,self._sy,self._sw,self._sh)
 end
+
+return Camera

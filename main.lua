@@ -3,6 +3,8 @@ local loadTimeStart = love.timer.getTime()
 require 'globals'
 
 local RS = require "lib.resolution_solution"
+local StateMachine = require "objects.StateMachine"
+
 local canvas
 
 love.resize = function()
@@ -10,6 +12,8 @@ love.resize = function()
 end
 
 function love.load()
+	require("controls")
+
 	love.graphics.setDefaultFilter("nearest", "nearest", 1)
 	love.graphics.setLineStyle("rough")
 
@@ -21,7 +25,7 @@ function love.load()
 	canvas = love.graphics.newCanvas(GAME_WIDTH, GAME_HEIGHT)
 
 	World = Slick.newWorld(GAME_WIDTH, GAME_HEIGHT)
-	CurrentState = StateMachine(MissionSelect())
+	CurrentState = StateMachine(require("states.mission")())
 
     if DEBUG then
         local loadTimeEnd = love.timer.getTime()
@@ -99,6 +103,8 @@ function love.touchreleased(id)
 	Controls:touchreleased(id)
 end
 
+local FPS = 1/60
+
 function love.run()
     if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
  
@@ -123,11 +129,11 @@ function love.run()
         end
 
         -- Cap number of Frames that can be skipped so lag doesn't accumulate
-        if love.timer then lag = math.min(lag + love.timer.step(), PHYSICS_RATE * 2) end
+        if love.timer then lag = math.min(lag + love.timer.step(), FPS * 2) end
 
-        while lag >= PHYSICS_RATE do
-            if love.update then love.update(PHYSICS_RATE) end
-            lag = lag - PHYSICS_RATE
+        while lag >= FPS do
+            if love.update then love.update(FPS) end
+            lag = lag - FPS
         end
 
         if love.graphics and love.graphics.isActive() then

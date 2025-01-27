@@ -1,24 +1,28 @@
-Player = class({
+local _PATH = (...)
+local GameObject = require "objects.GameObject"
+local Aseprite = require "objects.Aseprite"
+local Player = class({
 	name = "Player",
 	extends = GameObject
 })
-Player.states = {
-	normal = require "src.player.normal",
-	slide = require "src.player.slide",
-	crouch = require "src.player.crouch",
-	longjump = require "src.player.longjump",
-}
-Player.state = Player.states.normal
+
+local palette = love.graphics.newShader("shaders/paletteSwap.glsl")
+local GRID_SIZE = 48
+
 Player.width = 10
 Player.height = 24
 Player.character = "mario"
 Player.runTime = 1.9
 
-local palette = love.graphics.newShader("src/shaders/paletteSwap.glsl")
-
-local GRID_SIZE = 48
-
 function Player:new(x, y)
+	self.states = {
+		normal = require(_PATH..".states.normal"),
+		slide = require(_PATH..".states.slide"),
+		crouch = require(_PATH..".states.crouch"),
+		longjump = require(_PATH..".states.longjump"),
+	}
+	self.state = self.states.normal
+
 	self.animation = Aseprite("assets/images/aseprite/MarioSheet.aseprite")
 	self:setPalette("default")
 	self:super(x, y)
@@ -110,3 +114,5 @@ function Player:draw()
 		GameObject.draw(self)
 	end
 end
+
+return Player

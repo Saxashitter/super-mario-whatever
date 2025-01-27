@@ -1,4 +1,6 @@
-Level = class({
+local TileSet = require("objects.tilemap.TileSet")
+
+local Level = class({
 	name = "Level",
 	extends = GameObject
 })
@@ -165,3 +167,5 @@ function Level:isInCamera(object)
 		end
 	end
 end
+
+return Level

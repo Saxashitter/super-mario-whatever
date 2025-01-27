@@ -1,4 +1,5 @@
-TileSet = class{name = "TileSet"}
+local TileSet = class{name = "TileSet"}
+local Tile = require "objects.tilemap.Tile"
 
 function TileSet:new(properties)
 	self.tiles = {}
@@ -53,3 +54,5 @@ function TileSet:createTile(id, x, y)
 
 	return Tile(x, y, self.tiles[id], self)
 end
+
+return TileSet

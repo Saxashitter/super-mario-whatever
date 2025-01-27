@@ -1,4 +1,5 @@
 local state = {}
+local Player = require "objects.actors.Player"
 
 local JUMP_HEIGHT = 4
 local AIR_ACCEL = .1

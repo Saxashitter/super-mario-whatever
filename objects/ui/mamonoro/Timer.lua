@@ -1,4 +1,6 @@
-MamoruTimer = class{name = "MamoruTimer"}
+local Animation = require "objects.animation"
+
+local MamoruTimer = class{name = "MamoruTimer"}
 
 MamoruTimer.width = 128
 MamoruTimer.height = 128
@@ -59,3 +61,5 @@ function MamoruTimer:draw(time, left)
 		)
 	end
 end
+
+return MamoruTimer

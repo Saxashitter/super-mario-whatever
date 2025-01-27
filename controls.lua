@@ -1,4 +1,6 @@
 -- CONTROLS
+local TouchControls = require "objects.mobile.TouchControls"
+
 Controls = { -- TODO: refactor to a class
 	init = function(self)
 		self.Baton = Baton.new{

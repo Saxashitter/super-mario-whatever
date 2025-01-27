@@ -1,4 +1,4 @@
-Animation = class({
+local Animation = class({
 	name = "Animation"
 })
 
@@ -82,3 +82,5 @@ function Animation:draw(...)
 
 	love.graphics.draw(self.image, frame, ...)
 end
+
+return Animation

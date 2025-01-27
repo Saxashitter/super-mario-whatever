@@ -1,4 +1,4 @@
-GameObject = class({
+local GameObject = class({
 	name = "GameObject"
 })
 
@@ -188,3 +188,5 @@ function GameObject:move()
 
 	self.x, self.y = actualX, actualY
 end
+
+return GameObject

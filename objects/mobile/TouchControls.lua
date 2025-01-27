@@ -1,5 +1,4 @@
-TouchControls = class{name = "TouchControls"}
-
+local TouchControls = class{name = "TouchControls"}
 local JOYSTICK_DEADZONE = 0.3
 
 function TouchControls:new()
@@ -219,3 +218,5 @@ function TouchControls:draw()
 	end
 	love.graphics.setColor(r,g,b,a)
 end
+
+return TouchControls

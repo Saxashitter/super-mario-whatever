@@ -1,4 +1,5 @@
-Tile = class{name = "Tile", extends = GameObject}
+local GameObject = require "objects.GameObject"
+local Tile = class{name = "Tile", extends = GameObject}
 
 function Tile:defineShape()
 	return Slick.newRectangleShape(0,0,self.width,self.height)
@@ -20,3 +21,5 @@ function Tile:draw()
 		math.floor(self.x),
 		math.floor(self.y))
 end
+
+return Tile

@@ -1,4 +1,5 @@
 local state = {}
+local Player = require "objects.actors.Player"
 
 local FORWARD_SPEED = .13
 local BACK_SPEED = .1

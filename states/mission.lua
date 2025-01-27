@@ -1,4 +1,7 @@
-MissionSelect = class{name = "MissionSelect", extends = State}
+local State = require "objects.State"
+local Sprite = require "objects.Sprite"
+local actors = require "objects.actors"
+local MissionSelect = class{name = "MissionSelect", extends = State}
 
 MissionSelect.MAMONORO_SCALE = 1.5
 MissionSelect.stages = {
@@ -17,6 +20,7 @@ MissionSelect.stages = {
 		dialogue = {portrait = {2,1}, dialogue = "i am still fululu higokudani"}
 	}
 }
+
 MissionSelect.current = 1
 
 local UNSELECTED_X = -300
@@ -72,7 +76,7 @@ function MissionSelect:new()
 	self.fululu = Sprite(nil, self.frame.x+pos, self.frame.y+pos)
 	self.fululu.scale = self.MAMONORO_SCALE
 	self.fululu:setSpriteSheet("assets/images/ui/portraits/fululu_big.png", 3, 2)
-	self.fululu:setQuad(2, 1)
+	self.fululu:setQuad(1, 1)
 
 	self:add(self.background)
 	self:add(self.stageSelect)
@@ -105,7 +109,7 @@ function MissionSelect:update(dt)
 	end
 
 	if Controls:pressed("jump") then
-		local state = GameState(self.stages[self.current].path)
+		local state = require("states.game")(self.stages[self.current].path)
 
 		CurrentState:change(state)
 	end
@@ -151,3 +155,5 @@ function MissionSelect:draw()
 		scale,
 		scale)
 end
+
+return MissionSelect

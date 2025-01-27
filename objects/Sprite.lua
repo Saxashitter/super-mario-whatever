@@ -1,4 +1,4 @@
-Sprite = class{name = "Sprite"}
+local Sprite = class{name = "Sprite"}
 
 Sprite.x = 0
 Sprite.y = 0
@@ -141,3 +141,5 @@ function Sprite:draw()
 		y = y + height
 	end
 end
+
+return Sprite

@@ -1,4 +1,5 @@
 local state = {}
+local Player = require "objects.actors.Player"
 
 local WALK_SPEED = 1.6
 local MIN_WALK_SPEED = .8

@@ -1,4 +1,5 @@
 local state = {}
+local Player = require "objects.actors.Player"
 
 local SLIDE_DECEL = 0.02
 local STOP_SPEED = 0.2

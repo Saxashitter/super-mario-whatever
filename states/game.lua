@@ -1,4 +1,10 @@
-GameState = class{name = "GameState", extends = State}
+local State = require "objects.State"
+local Camera = require "objects.Camera"
+local Level = require "objects.tilemap.Level"
+local Timer = require "objects.ui.mamonoro.Timer"
+local Actors = require "objects.actors"
+
+local GameState = class{name = "GameState", extends = State}
 
 local function cameraThink(self)
 	local x_speed = 4
@@ -45,11 +51,11 @@ function GameState:new(map)
 
 	local player_x, player_y = 0,0
 	if self.level.markers.player_pos then
-		player_x = self.level.markers.player_pos[1].x-(Player.width/2)
-		player_y = self.level.markers.player_pos[1].y-(Player.height)
+		player_x = self.level.markers.player_pos[1].x-(Actors.Player.width/2)
+		player_y = self.level.markers.player_pos[1].y-(Actors.Player.height)
 	end
 
-	self.player = Player(player_x, player_y)
+	self.player = Actors.Player(player_x, player_y)
 	self:add(self.player)
 	self:bindObjectToViewport(self.gameCamera, self.player)
 
@@ -58,7 +64,7 @@ function GameState:new(map)
 
 	self.gameCamera.follow = self.player
 
-	self.timer = MamoruTimer(0, 0)
+	self.timer = Timer(0, 0)
 	self:add(self.timer)
 	self:bindObjectToViewport(self.hudCamera, self.timer)
 
@@ -76,3 +82,5 @@ function GameState:update(dt)
 	State.update(self, dt)
 	cameraThink(self)
 end
+
+return GameState
