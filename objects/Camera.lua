@@ -6,7 +6,7 @@ Camera.rot = 0
 Camera.scale = 1
 Camera.deadzone = {x = 0, y = 0}
 Camera.offset = {x = 0, y = 0}
-Camera.area = {x = 0, y = 0, x2 = 0, y2 = 0}
+Camera.area = {x = 0, y = 0, x2 = 0, y2 = 0, enabled = false}
 Camera.noclip = false
 
 function Camera:new(x, y)
@@ -15,14 +15,14 @@ function Camera:new(x, y)
 
 	self.deadzone = {x=0, y=0}
 	self.offset = {x=0, y=0}
-	self.area = {x=0, y=0, x2=0, y2=0}
+	self.area = {x=0, y=0, x2=0, y2=0, enabled = false}
 end
 
 function Camera:setDeadzone(x, y)
 	self.deadzone = {x=x, y=y, enabled=true}
 end
 function Camera:setArea(x, y, x2, y2)
-	self.area = {x=x, y=y, x2=x2, y2=y2}
+	self.area = {x=x, y=y, x2=x2, y2=y2, enabled = true}
 end
 
 function Camera:update()
@@ -57,7 +57,8 @@ function Camera:getPosition()
 	local screenWidth = GAME_WIDTH*0.5/scale
 	local screenHeight = GAME_HEIGHT*0.5/scale
 
-	if not self.noclip then
+	if not self.noclip
+	and self.area.enabled then
 		local areaScale = math.max(self.area.x/self.area.x2, self.area.y/self.area.y2)
 
 		scale = math.max(scale, areaScale)
@@ -67,6 +68,9 @@ function Camera:getPosition()
 		x = mathx.clamp(x, self.area.x+screenWidth, self.area.x2-screenWidth)
 		y = mathx.clamp(y, self.area.y+screenHeight, self.area.y2-screenHeight)
 	end
+
+	x = math.floor(x)
+	y = math.floor(y)
 
 	return x, y, scale
 end

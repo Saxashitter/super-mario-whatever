@@ -34,9 +34,6 @@ function Aseprite:new(asePath)
                     box = {x=cel.x, y=cel.y, w=cel.width, h=cel.h},
                     duration = frame.frame_duration / 1000
                 })
-                if frame.frame_duration ~= 100 then
-        	      print(frame.frame_duration)
-        		end
                 -- tag
             elseif chunk.type == 0x2018 then
                 for i, tag in ipairs(chunk.data.tags) do

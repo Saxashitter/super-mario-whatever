@@ -23,7 +23,7 @@ end
 function Sprite:set(image)
 	if image == nil then return end
 	if type(image) == "string" then
-		image = love.graphics.newImage(image)
+		image = makeImage(image)
 	end
 
 	self.spritesheet = nil

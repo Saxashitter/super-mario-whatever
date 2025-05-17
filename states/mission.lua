@@ -1,6 +1,7 @@
 local State = require "objects.State"
 local Sprite = require "objects.Sprite"
-local actors = require "objects.actors"
+local Mosiac = require "objects.transitions.Mosiac"
+local CharacterSelect = require "states.mamonoro.character"
 local MissionSelect = class{name = "MissionSelect", extends = State}
 
 MissionSelect.MAMONORO_SCALE = 1.5
@@ -28,11 +29,7 @@ local SELECTED_X = 50
 
 function MissionSelect:new()
 	self:super()
-
-	-- music
-	self.music = love.audio.newSource("assets/music/mamoru/SacredTree.ogg", "stream")
-	self.music:setLooping(true)
-	self.music:play()
+	self.sprites = {}
 
 	-- background
 	self.background = Sprite("assets/images/ui/parallax/mamonoro_mission.png", 0,0)
@@ -78,19 +75,28 @@ function MissionSelect:new()
 	self.fululu:setSpriteSheet("assets/images/ui/portraits/fululu_big.png", 3, 2)
 	self.fululu:setQuad(1, 1)
 
-	self:add(self.background)
-	self:add(self.stageSelect)
+	table.insert(self.sprites, self.background)
+	table.insert(self.sprites, self.stageSelect)
 	for i = 1,#self.stageDisplays do
-		self:add(self.stageDisplays[i])
+		table.insert(self.sprites, self.stageDisplays[i])
 	end
 
-	self:add(self.frame)
-	self:add(self.fululu)
-	self:add(self.box)
+	table.insert(self.sprites, self.frame)
+	table.insert(self.sprites, self.fululu)
+	table.insert(self.sprites, self.box)
+end
+
+function MissionSelect:enter()
+	-- music
+	self.music = makeAudio("assets/music/mamoru/SacredTree.ogg", "stream")
+	self.music:setLooping(true)
+	self.music:play()
 end
 
 function MissionSelect:update(dt)
-	State.update(self, dt)
+	for _,sprite in pairs(self.sprites) do
+		sprite:update(dt)
+	end
 
 	local dir = 0
 	if Controls:pressed"left" then
@@ -108,10 +114,10 @@ function MissionSelect:update(dt)
 			0.25)
 	end
 
-	if Controls:pressed("jump") then
-		local state = require("states.game")(self.stages[self.current].path)
+	if Controls:pressed("a") then
+		local state = CharacterSelect(self.stages[self.current].path)
 
-		CurrentState:change(state)
+		Gamestate:change(state, Mosiac, Mosiac)
 	end
 end
 
@@ -129,7 +135,10 @@ function MissionSelect:exit()
 end
 
 function MissionSelect:draw()
-	State.draw(self)
+	for _,sprite in pairs(self.sprites) do
+		sprite:draw()
+	end
+
 	local scale = 2
 	local width = (self.box.width*self.box.scale - 32)/scale
 	local text = self.stages[self.current].dialogue.dialogue

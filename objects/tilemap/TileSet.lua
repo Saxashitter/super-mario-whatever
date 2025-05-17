@@ -3,8 +3,7 @@ local Tile = require "objects.tilemap.Tile"
 
 function TileSet:new(properties)
 	self.tiles = {}
-	self.image = love.graphics.newImage("assets/images/tilesets/"..properties.image)
-	self.image:setFilter("nearest")
+	self.image = makeImage("assets/images/tilesets/"..properties.image)
 	self.tilewidth = properties.grid.width
 	self.tileheight = properties.grid.height
 	self.firstgid = properties.firstgid
@@ -32,10 +31,9 @@ function TileSet:new(properties)
 	end
 
 	for _,tile in pairs(properties.tiles) do
-		if self.tiles[tile.id] then
+		if self.tiles[tile.id+1] then
 			for i,property in pairs(tile.properties) do
-				self.tiles[tile.id][i] = property
-				print("set property for tile "..tile.id)
+				self.tiles[tile.id+1][i] = property
 			end
 		end
 	end

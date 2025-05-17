@@ -9,9 +9,10 @@ Controls = { -- TODO: refactor to a class
 				down = {"key:s"},
 				up = {"key:w"},
 				right = {"key:d"},
-				jump = {"key:j"},
-				spin = {"key:k"},
-				run = {"key:lshift"}
+				a = {"key:j", "key:space"},
+				b = {"key:k"},
+				x = {"key:lshift", "key:l"},
+				y = {"key:m"}
 			}
 		}
 		if love._os == "Android" then
@@ -22,9 +23,10 @@ Controls = { -- TODO: refactor to a class
 			controls:joystick("move", 130, height - 70, 55, {
 				"left", "down", "up", "right"
 			})
-			controls:button("jump", width - 30, height - 40, 30)
-			controls:button("run", width - 100, height - 90, 30)
-			controls:button("spin", width - 30, height - 140, 30)
+			controls:button("a", width - 60, height - 40, 30)
+			controls:button("b", width, height - 90, 30)
+			controls:button("x", width - 120, height - 90, 30)
+			controls:button("y", width - 60, height - 140, 30)
 
 			self.mobile = controls
 		end

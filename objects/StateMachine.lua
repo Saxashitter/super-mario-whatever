@@ -1,19 +1,35 @@
 local StateMachine = class{name = "StateMachine"}
 local State = require("objects.State")
 
-function StateMachine:change(state)
+local function change(self, state, transition)
 	if not (state
 	and state.is
 	and state:is(State)) then
 		return
 	end
 
+	clearImageCache()
+	clearAudioCache()
+
 	if self.current then
 		self.current:exit(state)
 	end
+	state:enter(self.current)
 
 	self.current = state
+	self.transition = transition and transition(false)
 	collectgarbage()
+end
+
+function StateMachine:change(state, transitionIn, transitionOut)
+	if transitionIn then
+		self._state = state
+		self._transitionOut = transitionOut
+		self.transitionIn = transitionIn(true)
+		return
+	end
+
+	change(self, state, transitionOut)
 end
 
 function StateMachine:new(initialState)
@@ -27,13 +43,40 @@ end
 function StateMachine:update(dt)
 	if not self.current then return end
 
+	if self.transitionIn then
+		if self.transitionIn:isOver() then
+			change(self, self._state, self._transitionOut)
+			self._state = nil
+			self._transitionOut = nil
+			self.transitionIn = nil
+			print("do")
+		else
+			self.transitionIn:update(dt)
+		end
+		return
+	end
+
 	self.current:update(dt)
+
+	if self.transition then
+		if self.transition:isOver() then
+			self.transition = nil
+		else
+			self.transition:update(dt)
+		end
+	end
 end
 
 function StateMachine:draw()
 	if not self.current then return end
 
 	self.current:draw()
+	if self.transitionIn then
+		self.transitionIn:draw()
+	end
+	if self.transition then
+		self.transition:draw()
+	end
 end
 
 function StateMachine:call(value, ...)

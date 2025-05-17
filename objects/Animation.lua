@@ -12,6 +12,8 @@ function Animation:new(image, gridX, gridY, anims)
 	self.index = 0
 	self.framerate = 1
 	self.speed = 1
+	self.loop = false
+	self.finished = false
 
 	self.columns = math.floor(image:getWidth()/gridX)
 	self.rows = math.floor(image:getHeight()/gridY)
@@ -33,7 +35,7 @@ function Animation:new(image, gridX, gridY, anims)
 
 	if anims then
 		for k,v in ipairs(anims) do
-			self:defineAnim(v.name, v.frames, v.fps)
+			self:defineAnim(v.name, v.frames, v.fps, v.loop)
 		end
 		self:switch(anims.default)
 	else
@@ -42,10 +44,14 @@ function Animation:new(image, gridX, gridY, anims)
 end
 
 -- Frames table is as shown: {{0, 0}, {1, 0}}
-function Animation:defineAnim(name, frames, fps)
+function Animation:defineAnim(name, frames, fps, loop)
+	if loop == nil then
+		loop = true
+	end
 	local anim = {
 		fps = fps or 1,
-		frames = frames
+		frames = frames,
+		loop = loop
 	}
 
 	self.animations[name] = anim
@@ -60,6 +66,8 @@ function Animation:switch(name)
 	self.current = self.animations[name].frames
 	self.framerate = self.animations[name].fps
 	self.frame = self.animations[name].frames[1]
+	self.loop = self.animations[name].loop
+	self.finished = false
 end
 
 function Animation:update(dt)
@@ -69,8 +77,13 @@ function Animation:update(dt)
 
 	while self.delta >= dur do
 		self.delta = self.delta - dur
-		self.index = (self.index + 1) % #self.current
-		self.frame = self.current[self.index+1]
+		if self.loop
+		or self.index+1 < #self.current then
+			self.index = (self.index + 1) % #self.current
+			self.frame = self.current[self.index+1]
+		else
+			self.finished = true
+		end
 	end
 end
 

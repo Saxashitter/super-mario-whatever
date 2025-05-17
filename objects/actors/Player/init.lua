@@ -7,37 +7,54 @@ local Player = class({
 })
 
 local palette = love.graphics.newShader("shaders/paletteSwap.glsl")
-local GRID_SIZE = 48
 
 Player.width = 10
 Player.height = 24
 Player.character = "mario"
 Player.runTime = 1.9
 
-function Player:new(x, y)
-	self.states = {
-		normal = require(_PATH..".states.normal"),
-		slide = require(_PATH..".states.slide"),
-		crouch = require(_PATH..".states.crouch"),
-		longjump = require(_PATH..".states.longjump"),
-	}
-	self.state = self.states.normal
+function Player:new(x, y, character, world)
+	if not character then
+		character = require("assets.data.characters.meta")[1]
+	end
 
-	self.animation = Aseprite("assets/images/aseprite/MarioSheet.aseprite")
-	self:setPalette("default")
-	self:super(x, y)
+	local path = character.path
 
-	self.runTime = 0
+	self.characterMeta = character
+	self.character = require("assets.data.characters."..path)
+
+	self.sprite = Aseprite("assets/data/characters/"..path.."/sheet.aseprite")
+	self.scale = 1
+	self:setPalette("black")
+	
+	self.coins = 0
 	self.dir = 1
+	self.controls = {}
+	self:super(x, y, world)
 
-	if self.state
-	and self.state.enter then
-		self.state.enter(self)
+	if self.character.load then
+		self.character.load(self)
 	end
 end
 
+function Player:handleInputs()
+	local controls = {}
+
+	controls.left = Controls:down("left")
+	controls.down = Controls:down("down")
+	controls.up = Controls:down("up")
+	controls.right = Controls:down("right")
+	controls.a = Controls:down("a")
+	controls.b = Controls:down("b")
+	controls.x = Controls:down("x")
+	controls.y = Controls:down("y")
+	controls.a_press = controls.a and not (self.controls and self.controls.a)
+
+	self.controls = controls
+end
+
 function Player:setPalette(name)
-	local paletteData = love.image.newImageData("assets/images/translations/mario_"..name..".png")
+	local paletteData = love.image.newImageData("assets/data/characters/"..self.characterMeta.path.."/palettes/"..name..".png")
 
 	self.colors = {}
 	self.convertColors = {}
@@ -56,37 +73,20 @@ function Player:setPalette(name)
 	end
 end
 
-function Player:changeState(name)
-	if not self.states[name] then
-		return
-	end
-
-	if self.state
-	and self.state.exit then
-		self.state.exit(self)
-	end
-
-	self.state = self.states[name]
-
-	if self.state.enter then
-		self.state.enter(self)
-	end
-end
-
 function Player:physics()
-	if self.state
-	and self.state.physics then
-		self.state.physics(self)
+	self:handleInputs()
+
+	if self.character.physics then
+		self.character.physics(self)
 	end
 end
 
 function Player:update(dt)
-	if self.state
-	and self.state.update then
-		self.state.update(self, dt)
+	if self.character.update then
+		self.character.update(self, dt)
 	end
 
-	self.animation:update(dt)
+	self.sprite:update(dt)
 end
 
 function Player:draw()
@@ -99,20 +99,30 @@ function Player:draw()
 	palette:send("convertColors", unpack(self.convertColors))
 
 	love.graphics.setShader(palette)
-		self.animation:draw(
-			self.x + ox,
-			self.y + self.height - oy,
-			rot,
-			self.dir,
-			1,
-			GRID_SIZE/2,
-			GRID_SIZE
-		)
+	self.sprite:draw(
+		self.x + ox,
+		self.y + self.height - oy,
+		rot,
+		self.dir*self.scale,
+		self.scale,
+		self.sprite.width/2,
+		self.sprite.height
+	)
 	love.graphics.setShader()
 
 	if DEBUG then
 		GameObject.draw(self)
 	end
+end
+
+function Player:getSync()
+	local sync = GameObject.sync(self)
+
+	sync.animation = {}
+	sync.animation.active = self.animation.active
+	sync.animation.index = self.animation.index
+
+	return sync
 end
 
 return Player

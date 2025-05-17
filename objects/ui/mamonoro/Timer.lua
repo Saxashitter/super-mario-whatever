@@ -1,4 +1,4 @@
-local Animation = require "objects.animation"
+local Animation = require "objects.Animation"
 
 local MamoruTimer = class{name = "MamoruTimer"}
 
@@ -13,7 +13,7 @@ function MamoruTimer:new(x, y)
 	self.x = x or 0
 	self.y = y or 0
 
-	self.image = love.graphics.newImage("assets/images/ui/timer/time.png")
+	self.image = makeImage("assets/images/ui/timer/time.png")
 	self.flame = Animation(
 		love.graphics.newImage("assets/images/ui/timer/flame.png"),
 		FLAME_WIDTH,

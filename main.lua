@@ -14,9 +14,6 @@ end
 function love.load()
 	require("controls")
 
-	love.graphics.setDefaultFilter("nearest", "nearest", 1)
-	love.graphics.setLineStyle("rough")
-
 	RS.conf{
 		game_width = GAME_WIDTH,
 		game_height = GAME_HEIGHT,
@@ -24,8 +21,7 @@ function love.load()
 	}
 	canvas = love.graphics.newCanvas(GAME_WIDTH, GAME_HEIGHT)
 
-	World = Slick.newWorld(GAME_WIDTH, GAME_HEIGHT)
-	CurrentState = StateMachine(require("states.mission")())
+	Gamestate = StateMachine(require("states.splash")())
 
     if DEBUG then
         local loadTimeEnd = love.timer.getTime()
@@ -36,7 +32,7 @@ end
 
 function love.update(dt)
 	Controls:update(dt)
-	CurrentState:update(dt)
+	Gamestate:update(dt)
 	PrintLib.update(dt)
 end
 
@@ -45,19 +41,23 @@ function love.draw()
 	love.graphics.clear(0,0,0,1)
 
 	local drawTimeStart = love.timer.getTime()
-	CurrentState:draw()
+	Gamestate:draw()
 	local drawTimeEnd = love.timer.getTime()
 	local drawTime = drawTimeEnd - drawTimeStart
 
 	love.graphics.setCanvas()
 	RS.push()
 		love.graphics.draw(canvas)
+		love.graphics.rectangle("line", 0,0,GAME_WIDTH,GAME_HEIGHT)
 	RS.pop()
+
+	Controls:draw()
 
 	if DEBUG then
 		love.graphics.push()
+		local scale = 0.8
 		local x, y = 8, 6
-		local dy = 18
+		local dy = SMWBig:getHeight()
 		local stats = love.graphics.getStats()
 		local memoryUnit = "KB"
 		local ram = collectgarbage("count")
@@ -80,20 +80,25 @@ function love.draw()
 		    "Fonts: " .. stats.fonts,
 		}
 		for i, text in ipairs(info) do
-			love.graphics.print(text, x, y + (i-1)*dy)
+			love.graphics.print(text, x, y + (i-1)*dy, 0, scale)
 		end
 
 		PrintLib.draw()
 		love.graphics.pop()
 	end
-
-	Controls:draw()
 end
 
 function love.keypressed(key, code, isRepeat)
     if not RELEASE and code == "`" then
         DEBUG = not DEBUG
     end
+end
+
+function love.textinput(t)
+	print(t)
+	if Gamestate.current then
+		Gamestate.current:textinput(t)
+	end
 end
 
 function love.touchpressed(id)
