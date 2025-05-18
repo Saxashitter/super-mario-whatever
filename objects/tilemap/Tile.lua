@@ -7,6 +7,16 @@ function Tile:new(x, y, tile, tileset, properties)
 	self.tileset = tileset
 	self.tile = tile
 
+	self.cols = {
+		type = "aabb",
+		onOverlap = function() end,
+		onResolve = function() end
+	}
+
+	if self.tile.slope == "true" then
+		self.cols.type = "slope"
+	end
+
 	self:super(x, y)
 end
 

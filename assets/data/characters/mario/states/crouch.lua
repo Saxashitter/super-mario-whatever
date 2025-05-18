@@ -11,7 +11,7 @@ function state:enter()
 	self.sprite:switch "crouch"
 	self.sprite.speed = 1
 	self.runTime = 0
-	self:resize(10, 12)
+	self:resize(Player.width, 12)
 end
 
 function state:update(dt)

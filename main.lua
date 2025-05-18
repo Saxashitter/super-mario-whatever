@@ -21,7 +21,7 @@ function love.load()
 	}
 	canvas = love.graphics.newCanvas(GAME_WIDTH, GAME_HEIGHT)
 
-	Gamestate = StateMachine(require("states.splash")())
+	Gamestate = StateMachine(require("states.game")("test"))
 
     if DEBUG then
         local loadTimeEnd = love.timer.getTime()

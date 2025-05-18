@@ -6,7 +6,7 @@ local STOP_SPEED = 0.2
 
 function state:enter()
 	self.sprite.speed = 1
-	self:resize(18, 8)
+	self:resize(Player.width, 8)
 	self.sprite:switch"slide"
 end
 

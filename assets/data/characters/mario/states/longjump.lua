@@ -49,7 +49,6 @@ function state:physics()
 		if math.abs(self.momx) <= self.speed then
 			self.momx = mathx.approach(self.momx, self.speed*self.dir, FORWARD_SPEED)
 		else
-			print "guh"
 			self.momx = mathx.approach(self.momx, self.speed*self.dir, CORRECT_SPEED)
 		end
 	elseif dir == -self.dir then
