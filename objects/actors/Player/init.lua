@@ -1,6 +1,6 @@
 local _PATH = (...)
 local GameObject = require "objects.GameObject"
-local Aseprite = require "objects.Aseprite"
+local Aseprite = require "objects.animation.Aseprite"
 local Player = class({
 	name = "Player",
 	extends = GameObject

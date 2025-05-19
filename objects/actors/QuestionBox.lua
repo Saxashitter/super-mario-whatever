@@ -2,7 +2,6 @@ local GameObject = require "objects.GameObject"
 local Player = require "objects.actors.Player"
 local QuestionBox = class{name = "QuestionBox", extends = GameObject}
 
-QuestionBox.collide = true
 QuestionBox.width = 16
 QuestionBox.height = 16
 

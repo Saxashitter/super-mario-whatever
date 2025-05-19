@@ -14,7 +14,7 @@ function Aseprite:new(asePath)
 	self.tags = {}
 	self.active = ""
 	self.index = 1
-	self.time = 0
+	self.delta = 0
 
 	for _, frame in ipairs(ase.header.frames) do
         for _, chunk in ipairs(frame.chunks) do
@@ -24,7 +24,6 @@ function Aseprite:new(asePath)
                 local buffer = love.data.decompress("data", "zlib", cel.data)
                 local data = love.image.newImageData(cel.width, cel.height, "rgba8", buffer)
                 local image = love.graphics.newImage(data)
-                image:setFilter("nearest")
 
 				local ox = 0
 				local oy = 0
@@ -58,12 +57,12 @@ function Aseprite:update(dt)
 	local tag = self.tags[self.active]
 
 	if (tag.to - tag.from) ~= 0 then
-		self.time = self.time + dt * self.speed
+		self.delta = self.delta + dt * self.speed
 
 		-- next frame
-		if self.time >= self.frames[self.index].duration then
+		if self.delta >= self.frames[self.index].duration then
 			self.index = self.index + 1
-			self.time = 0 -- you can change to "self.time - frame.duration" as well
+			self.delta = 0 -- you can change to "self.delta - frame.duration" as well
 
 			-- reach the end, return to begin
 			if self.index > tag.to then
@@ -76,7 +75,7 @@ end
 function Aseprite:switch(name)
 	if not self.tags[name] then return end
 
-	self.time = 0
+	self.delta = 0
 	self.active = name
 	self.index = self.tags[name].from
 end

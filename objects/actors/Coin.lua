@@ -2,7 +2,7 @@ local Coin = class{
 	name = "Coin",
 	extends = require("objects.GameObject")
 }
-local Animation = require("objects.Animation")
+local Animation = require("objects.animation.Animation")
 
 Coin.width = 16
 Coin.height = 16

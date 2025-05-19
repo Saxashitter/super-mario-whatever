@@ -2,6 +2,7 @@ local Characters = require("assets.data.characters.meta")
 local Sprite = require("objects.Sprite")
 local Menu = require("objects.Menu")
 local GameState = require("states.game")
+local Mosiac = require "objects.transitions.Mosiac"
 local State = class{
 	name = "CharacterSelect",
 	extends = require("objects.State")
@@ -112,7 +113,7 @@ function State:update(dt)
 
 	if Controls:pressed("a") then
 		local state = require("states.game")(self.stage, Characters[self.index])
-		Gamestate:change(state)
+		Gamestate:change(state, Mosiac, Mosiac)
 	end
 end
 

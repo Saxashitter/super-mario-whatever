@@ -1,7 +1,7 @@
 local HUD = class{
 	name = "HUD"
 }
-local Animation = require("objects.Animation")
+local Animation = require("objects.animation.Animation")
 
 local TEXT_SCALE = GAME_SCALE*0.75
 
