@@ -28,8 +28,7 @@ jobs:
           name: ${{ env.CORE_LOVE_ARTIFACT_NAME }}
           path: ${{ env.CORE_LOVE_PACKAGE_PATH }}
   build-desktop:
-    runs-on: windows-latest
-    needs: [build-core]
+    runs-on: ubuntu-latest
     env:
       OUTPUT_FOLDER: ./build
     steps:
