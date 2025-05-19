@@ -20,9 +20,19 @@ function clearAudioCache()
 	audios = {}
 	collectgarbage()
 end
+
 function clearImageCache()
+	--[[for _, image in pairs(images) do
+			image:release()
+	end]]
 	images = {}
+
 	collectgarbage()
+end
+
+function clearCache()
+	clearImageCache()
+	clearAudioCache()
 end
 
 function makeImage(path, forceNew)
@@ -59,6 +69,20 @@ function makeAudio(path, type, forceNew)
 
 	return audio
 end
+
+-- we gotta create the mods folder
+local function safetyCheck(path, onCreate)
+	if not love.filesystem.getInfo(path, "directory") then
+		assert(love.filesystem.createDirectory(path), "Failed to create path: \""..path.."\". Create the path yourself.")
+	
+		if onCreate then
+			onCreate()
+		end
+	end
+end
+
+safetyCheck("mods")
+safetyCheck("mods/characters")
 
 GRAVITY = 0.280
 DEBUG = true

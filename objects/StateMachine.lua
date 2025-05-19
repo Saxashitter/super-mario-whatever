@@ -8,17 +8,16 @@ local function change(self, state, transition)
 		return
 	end
 
-	clearImageCache()
-	clearAudioCache()
-
 	if self.current then
 		self.current:exit(state)
 	end
 	state:enter(self.current)
+	self.current = nil
+
+	clearCache()
 
 	self.current = state
 	self.transition = transition and transition(false)
-	collectgarbage()
 end
 
 function StateMachine:change(state, transitionIn, transitionOut)
@@ -49,7 +48,6 @@ function StateMachine:update(dt)
 			self._state = nil
 			self._transitionOut = nil
 			self.transitionIn = nil
-			print("do")
 		else
 			self.transitionIn:update(dt)
 		end
