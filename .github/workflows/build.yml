@@ -23,7 +23,7 @@ jobs:
         with:
           package-path: ${{ env.CORE_LOVE_PACKAGE_PATH }}
       - name: Upload core love package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.CORE_LOVE_ARTIFACT_NAME }}
           path: ${{ env.CORE_LOVE_PACKAGE_PATH }}
