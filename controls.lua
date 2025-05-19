@@ -12,7 +12,8 @@ Controls = { -- TODO: refactor to a class
 				a = {"key:j", "key:space"},
 				b = {"key:k"},
 				x = {"key:lshift", "key:l"},
-				y = {"key:m"}
+				y = {"key:m"},
+				menu = {"key:escape", "key:return"}
 			}
 		}
 		if love._os == "Android" then
@@ -27,6 +28,7 @@ Controls = { -- TODO: refactor to a class
 			controls:button("b", width, height - 90, 30)
 			controls:button("x", width - 120, height - 90, 30)
 			controls:button("y", width - 60, height - 140, 30)
+			controls:button("menu", 60, 40, 30)
 
 			self.mobile = controls
 		end

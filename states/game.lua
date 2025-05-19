@@ -85,6 +85,10 @@ function GameState:enter()
 end
 
 function GameState:update(dt)
+	if Controls:pressed("menu") then
+		Gamestate:change(require("states.title")())
+		return
+	end
 	self.level:update(dt)
 
 	for i = #self.entities, 1, -1 do
@@ -142,6 +146,10 @@ function GameState:update(dt)
 	self.gameCamera:update(dt)
 	self.hud:update(dt)
 	cameraThink(self)
+end
+
+function GameState:exit()
+	self.music:stop()
 end
 
 function GameState:draw(dt)
