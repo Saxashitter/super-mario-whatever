@@ -38,7 +38,7 @@ jobs:
           submodules: recursive
       # Download your core love package here
       - name: Download core love package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.CORE_LOVE_ARTIFACT_NAME }}
       - name: Build Windows packages
@@ -51,12 +51,12 @@ jobs:
           product-name: ${{ env.PRODUCT_NAME }}
           output-folder: ${{ env.OUTPUT_FOLDER }}
       - name: Upload 32-bit artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ needs.get-info.outputs.base-name }}_Windows_x86
           path: ${{ env.OUTPUT_FOLDER }}/${{ env.PRODUCT_NAME }}_x86.zip
       - name: Upload 64-bit artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ needs.get-info.outputs.base-name }}_Windows_x64
           path: ${{ env.OUTPUT_FOLDER }}/${{ env.PRODUCT_NAME }}_x64.zip
@@ -66,12 +66,12 @@ jobs:
     env:
       OUTPUT_FOLDER: ./build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       # Download your core love package here
       - name: Download core love package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.CORE_LOVE_ARTIFACT_NAME }}
       - name: Make folders
@@ -93,7 +93,7 @@ jobs:
           version-code: 100
           output-folder: ${{ env.OUTPUT_FOLDER }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ needs.get-info.outputs.base-name }}_Android_release
           path: ${{ env.OUTPUT_FOLDER }}
